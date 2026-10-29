@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Terrific.eng App</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Onest:wght@400;500;600;700&display=swap">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+/* Layout: one phone-width column; pink test card on top, then free rubrics as accordions, paid courses, locked club tiles */
+:root{
+  --bg:#fbf6f8; --surface:#ffffff; --ink:#24131c; --muted:#7a6470; --line:#eedde5;
+  --pink:#fd1796; --pink-soft:#ffe3f1; --pink-ink:#b3005f; --ok:#1f9d6b; --bad:#d4334a;
+  --display:"Unbounded","Arial Black",system-ui,sans-serif;
+  --body:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:18px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#150b11; --surface:#21131b; --ink:#fbeef4; --muted:#b799a8; --line:#3a2330;
+  --pink:#ff3aa6; --pink-soft:#3a1229; --pink-ink:#ff8fca; --ok:#45d39b; --bad:#ff6b80; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#150b11; --surface:#21131b; --ink:#fbeef4; --muted:#b799a8; --line:#3a2330;
+  --pink:#ff3aa6; --pink-soft:#3a1229; --pink-ink:#ff8fca; --ok:#45d39b; --bad:#ff6b80; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;margin:0}
+.wrap{max-width:520px;margin:0 auto;padding-block:20px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:26px}
+a{color:inherit}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--pink);outline-offset:2px;border-radius:8px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+.eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+
+/* header */
+.top{display:flex;align-items:center;gap:12px}
+.mark{width:46px;height:46px;border-radius:14px;background:var(--pink);color:#fff;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:20px;flex:none}
+.top h1{font-size:19px;font-weight:700;letter-spacing:-.01em}
+.top p{margin:2px 0 0;color:var(--muted);font-size:13px}
+
+/* test hero */
+.hero{background:var(--pink);color:#fff;border-radius:24px;padding:22px;display:flex;flex-direction:column;gap:14px;position:relative;overflow:hidden}
+.hero h2{font-size:26px;font-weight:800;line-height:1.1}
+.hero p{margin:0;opacity:.92}
+.scale{display:flex;gap:6px}
+.scale span{flex:1;text-align:center;font-family:var(--display);font-size:12px;font-weight:700;padding:7px 0;border-radius:10px;background:rgba(255,255,255,.18)}
+.scale span.on{background:#fff;color:var(--pink)}
+.btn{border:0;border-radius:14px;padding:14px 18px;font-weight:700;font-size:15px;text-decoration:none;display:inline-flex;justify-content:center;align-items:center;gap:8px}
+.btn-white{background:#fff;color:#b3005f}
+.btn-pink{background:var(--pink);color:#fff}
+.btn-ghost{background:var(--pink-soft);color:var(--pink-ink)}
+.hero .last{font-size:13px;opacity:.9}
+
+/* sections */
+.sec{display:flex;flex-direction:column;gap:12px}
+.sec-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.sec-head h2{font-size:17px;font-weight:700}
+.tag{font-size:12px;font-weight:600;padding:3px 9px;border-radius:99px;background:var(--pink-soft);color:var(--pink-ink);white-space:nowrap}
+
+/* accordions */
+.acc{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.acc-btn{width:100%;background:none;border:0;display:flex;align-items:center;gap:12px;padding:15px 16px;text-align:left}
+.acc-ico{width:38px;height:38px;border-radius:12px;background:var(--pink-soft);display:grid;place-items:center;font-size:19px;flex:none}
+.acc-t{flex:1;min-width:0}
+.acc-t b{display:block;font-size:15px}
+.acc-t small{color:var(--muted);font-size:13px}
+.chev{width:22px;height:22px;flex:none;transition:transform .2s;color:var(--muted)}
+.acc.open .chev{transform:rotate(90deg);color:var(--pink)}
+.acc-list{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.acc-list a,.acc-list .soon{display:flex;align-items:center;gap:10px;padding:13px 16px 13px 66px;text-decoration:none;border-top:1px solid var(--line)}
+.acc-list > :first-child{border-top:0}
+.acc-list a:hover{background:var(--pink-soft)}
+.acc-list .t{flex:1;min-width:0}
+.acc-list .arrow{color:var(--pink);font-weight:700}
+.acc-list .soon{color:var(--muted)}
+.acc-list .soon em{font-style:normal;font-size:12px}
+
+/* courses */
+.course{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:10px}
+.course.feat{border:2px solid var(--pink)}
+.c-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.course h3{font-size:15px;font-weight:700;line-height:1.25}
+.price{font-family:var(--display);font-weight:700;font-size:15px;white-space:nowrap;color:var(--pink-ink)}
+.price small{display:block;font-family:var(--body);font-weight:500;font-size:11px;color:var(--muted);text-align:right}
+.course p{margin:0;color:var(--muted);font-size:14px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips span{font-size:12px;padding:4px 9px;border-radius:99px;border:1px solid var(--line);color:var(--muted)}
+.steps{display:flex;flex-direction:column;gap:6px;font-size:14px}
+.steps div{display:flex;justify-content:space-between;gap:10px;padding:8px 10px;border-radius:10px;background:var(--bg)}
+.steps b{font-weight:600}
+
+/* locked */
+.locked{background:var(--surface);border:1px dashed var(--pink);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:12px}
+.sub{font-size:13px;color:var(--muted);margin-top:-6px}
+.teacher{background:var(--bg);border-radius:12px;padding:12px 12px 12px 14px;font-size:14px}
+.teacher h4{margin:0 0 6px;font-family:var(--display);font-size:12px;font-weight:700;color:var(--pink-ink);letter-spacing:.02em}
+.teacher ul,.more>ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px}
+.folds{display:flex;flex-direction:column;gap:4px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding-block:6px}
+.folds .more-btn{width:100%;justify-content:space-between;padding:8px 0}
+.brand{display:flex;justify-content:center}
+.logo{width:132px;height:auto}
+.hero .who{display:flex;align-items:center;gap:14px}
+.ava{width:72px;height:72px;border-radius:50%;border:3px solid #fff;flex:none;object-fit:cover}
+.hero h1{font-size:18px;font-weight:800;line-height:1.15;letter-spacing:.01em}
+.subs{font-size:13px;opacity:.9;margin-top:4px}
+.testcard{background:var(--surface);border:2px solid var(--pink);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:10px}
+.testcard h3{font-size:17px;font-weight:700;line-height:1.25}
+.testcard p{margin:0;color:var(--muted);font-size:14px}
+.testcard .scale span{background:var(--pink-soft);color:var(--pink-ink)}
+.testcard .scale span.on{background:var(--pink);color:#fff}
+.testcard .last{font-size:13px;color:var(--muted)}
+.club{background:var(--surface);border:2px solid var(--pink);border-radius:22px;padding:18px 16px;display:flex;flex-direction:column;gap:12px}
+.club h3{font-size:17px;font-weight:700;line-height:1.35;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.club .big-t{font-size:21px;font-weight:800;line-height:1.2}
+.club .sub-t{font-size:14px;font-weight:600;margin-top:-6px}
+.club p{margin:0;color:var(--muted);font-size:14px}
+.soon-b{display:inline-block;vertical-align:middle;font-family:var(--body);font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 9px;border-radius:99px;background:var(--ink);color:var(--surface);margin-left:4px}
+.btn-off{background:var(--line);color:var(--muted);cursor:not-allowed}
+.lead{font-weight:700;font-size:15px}
+.lvls{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.lvls-l{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:var(--muted);margin-right:2px}
+.lvl{font-family:var(--display);font-size:12px;font-weight:700;padding:5px 10px;border-radius:99px;background:var(--pink);color:#fff;white-space:nowrap}
+.lock-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.lock-grid div{background:var(--bg);border-radius:12px;padding:11px;font-size:13px;display:flex;gap:8px;align-items:flex-start}
+.lock-grid div:last-child:nth-child(odd){grid-column:1 / -1}
+.lock-grid div::before{content:"🔒";font-size:12px}
+
+.foot{display:flex;flex-direction:column;gap:8px;align-items:center;text-align:center;color:var(--muted);font-size:13px}
+
+/* test screen */
+.qhead{display:flex;align-items:center;gap:12px}
+.back{background:var(--surface);border:1px solid var(--line);border-radius:12px;width:40px;height:40px;display:grid;place-items:center;flex:none}
+.bar{flex:1;height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--pink);transition:width .25s}
+.qnum{font-variant-numeric:tabular-nums;font-size:13px;color:var(--muted);min-width:44px;text-align:right}
+.qcard{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:22px 18px;display:flex;flex-direction:column;gap:16px}
+.qlevel{align-self:flex-start}
+.qtext{font-size:19px;font-weight:600;line-height:1.35}
+.qtext .gap{display:inline-block;min-width:64px;border-bottom:2px solid var(--pink);margin:0 2px}
+.opts{display:flex;flex-direction:column;gap:9px}
+.opt{background:var(--bg);border:1.5px solid var(--line);border-radius:14px;padding:13px 15px;text-align:left;font-size:16px;font-weight:500;transition:border-color .15s,background .15s}
+.opt:hover{border-color:var(--pink)}
+.opt.picked{border-color:var(--pink);background:var(--pink-soft)}
+.hint{font-size:13px;color:var(--muted);text-align:center}
+
+/* result */
+.res{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:22px 18px;display:flex;flex-direction:column;gap:16px;text-align:center}
+.big{font-family:var(--display);font-weight:800;font-size:72px;line-height:1;color:var(--pink)}
+.res .name{font-weight:700;font-size:17px}
+.res p{margin:0;color:var(--muted)}
+.ladder{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;text-align:center}
+.ladder div{display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;color:var(--muted)}
+.ladder i{display:block;height:46px;border-radius:10px;background:var(--line);position:relative;overflow:hidden}
+.ladder i b{position:absolute;inset:auto 0 0 0;background:var(--pink);opacity:.85}
+.ladder .me{color:var(--pink-ink)}
+.ladder .me i{outline:2px solid var(--pink);outline-offset:2px}
+.rec{display:flex;flex-direction:column;gap:10px;text-align:left}
+.row-btns{display:flex;flex-direction:column;gap:8px}
+.more-btn{background:none;border:0;padding:4px 0;display:flex;align-items:center;gap:6px;color:var(--pink-ink);font-weight:600;font-size:14px;align-self:flex-start}
+.more-btn .chev{width:18px;height:18px;color:var(--pink-ink)}
+.more-btn[aria-expanded="true"] .chev{transform:rotate(90deg)}
+.more{display:flex;flex-direction:column;gap:14px;font-size:14px}
+.more h4{margin:0 0 6px;font-family:var(--display);font-size:13px;font-weight:700}
+.more ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.feat-list{display:flex;flex-direction:column;gap:8px}
+.feat-list div{display:flex;gap:10px}
+.feat-list b{display:block}
+.feat-list span.e{font-size:18px;line-height:1.2}
+.feat-list p{margin:0;color:var(--muted);font-size:13px}
+.sched{display:flex;flex-direction:column;gap:6px}
+.sched div{display:grid;grid-template-columns:auto 1fr auto;gap:4px 10px;align-items:center;padding:9px 10px;border-radius:10px;background:var(--bg)}
+.sched .lv{font-family:var(--display);font-size:11px;font-weight:700;padding:4px 8px;border-radius:99px;background:var(--pink);color:#fff;white-space:nowrap}
+.sched small{grid-column:2;color:var(--muted)}
+.sched .st{grid-row:1 / span 2;grid-column:3;font-size:12px;font-weight:600;padding:3px 8px;border-radius:99px;white-space:nowrap}
+.st.yes{background:var(--pink-soft);color:var(--ok)}
+.st.no{background:var(--line);color:var(--muted)}
+.howto{display:flex;flex-direction:column;gap:8px;counter-reset:s}
+.howto div{display:flex;gap:10px}
+.howto div::before{counter-increment:s;content:counter(s);flex:none;width:24px;height:24px;border-radius:50%;background:var(--pink);color:#fff;display:grid;place-items:center;font-weight:700;font-size:12px}
+.howto p{margin:2px 0 0;color:var(--muted);font-size:13px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+/* ============ НАСТРОЙКИ: здесь меняются ссылки и тексты ============ */
+const CONFIG = {
+  appLink: "https://t.me/TerrificCommunityBot/terrific_channel",            // ссылка на само приложение (t.me/бот/app) — для кнопки «Поделиться»
+  contact: "terrificenglish",                          // ник ассистента для записи и вопросов
+  subscribeLink: "",                                   // ссылка на оплату подписки 999 ₽ (Tribute). Пусто = написать ассистенту
+  site: "https://www.terrific-eng.ru"
+};
+
+// Бесплатные рубрики канала. link: null → показывается «скоро»
+const C = "https://t.me/c/2011711843/";   // ссылки на посты закрытого канала TERRIFIC.ENG.CHANNEL
+const RUBRICS = [
+  { icon:"📒", title:"Рабочие тетради", sub:"PDF к рилсам: слова, задания, ключи", items:[
+    { t:"Рабочая тетрадь 13 · Сериал «Джентльмены», часть 2", link:C+847 },
+    { t:"Рабочая тетрадь 12 · Сериал «Джентльмены»", link:C+835 },
+    { t:"Рабочая тетрадь 11 · Разговорные выражения", link:C+823 },
+    { t:"Рабочая тетрадь 10 · Фразы носителей на каждый день", link:C+820 },
+    { t:"Рабочая тетрадь 9 · Как реагировать в разговоре", link:C+770 },
+    { t:"Рабочая тетрадь 8 · Реакции: «ещё бы», «вряд ли»", link:C+766 },
+    { t:"Рабочая тетрадь 7 · Отношения", link:C+755 },
+    { t:"Рабочая тетрадь 6 · Слова из новостей", link:C+752 },
+    { t:"Рабочая тетрадь 5 · Сериал Off Campus", link:C+750 },
+    { t:"Рабочая тетрадь 4 · Emotional English", link:C+744 },
+    { t:"Рабочая тетрадь 3 · 8 крутых выражений", link:C+741 },
+    { t:"Рабочая тетрадь 2", link:C+738 },
+    { t:"Рабочая тетрадь 1", link:C+734 },
+  ]},
+  { icon:"🧩", title:"Грамматика", sub:"Схемы, таблицы и частые ошибки", items:[
+    { t:"Таблица времён", link:C+194 },
+    { t:"Герундий и инфинитив: схема", link:C+242 },
+    { t:"Герундий и инфинитив: табличка для печати", link:C+246 },
+    { t:"Три глагола, после которых нужен -ing", link:C+268 },
+    { t:"Как использовать suggest", link:C+251 },
+    { t:"Have something done: «я подстриглась»", link:C+159 },
+    { t:"Слова-связки: however, moreover, due to", link:C+273 },
+    { t:"Где ставить запятые в английском", link:C+187 },
+    { t:"To me или for me?", link:C+112 },
+    { t:"Частая ошибка: recommend", link:C+418 },
+    { t:"Частая ошибка: How are you? → How have you been?", link:C+435 },
+    { t:"Частая ошибка: other и another", link:C+441 },
+    { t:"Hurt, ache, pain, sore: в чём разница", link:C+174 },
+  ]},
+  { icon:"🧠", title:"Как учить английский", sub:"Слова, аудирование, говорение", items:[
+    { t:"Гайд: как запоминать слова легко и быстро", link:C+204 },
+    { t:"Алгоритм запоминания новых слов", link:C+340 },
+    { t:"Не понимаю, что говорят: почему и что делать", link:C+10 },
+    { t:"Как экстренно поднять говорение. Часть 1", link:C+782 },
+    { t:"Как экстренно поднять говорение. Часть 2", link:C+783 },
+    { t:"Как экстренно поднять говорение. Часть 3", link:C+786 },
+    { t:"Как экстренно поднять говорение. Часть 4", link:C+796 },
+    { t:"Почему вы годами стоите на одном уровне", link:C+767 },
+    { t:"Трекер привычек для занятий", link:C+379 },
+  ]},
+];
+
+const dm = (text) => `https://t.me/${CONFIG.contact}?text=${encodeURIComponent(text)}`;
+
+const LOCKED = ["Задания каждый день под ваш уровень","Одно видео в неделю","Приложение с играми для отработки слов","Рабочие тетради каждый день","Проверка домашних заданий куратором","Грамматика под ваш уровень","Офлайн и онлайн встречи","Возможность общаться с Анастасией TERRIFIC.ENG лично"];
+
+const COURSES = [
+  { id:"daily", feat:true, soon:true, title:"TERRIFIC COMMUNITY", price:"999 ₽", per:"в месяц",
+    lead:"Английский каждый день в закрытом канале",
+    text:"Каждую неделю одно видео: 30–40 новых слов и задания на каждый день по 10–15 минут. Куратор проверяет ваши домашние задания и даёт обратную связь.",
+    levels:["A2+ – B1","B1+ – B2","B2+ – C1"],
+    inside:LOCKED,
+    btn:"Вступить в TERRIFIC COMMUNITY", link:()=>CONFIG.subscribeLink || dm("Хочу в TERRIFIC COMMUNITY") },
+  { id:"speaking", title:"Terrific Speaking · разговорный клуб", price:"6 000 ₽", per:"4 занятия",
+    text:"Разговорный клуб, где мы выводим говорение на новый уровень. Zoom, группы до 8 человек, вы говорите почти всё занятие.",
+    levels:["B1+ / B2","B2+ / C1"],
+    chips:["Zoom · пары по 2","до 8 человек"],
+    more:{
+      who:["Понимаете английский, но «зависаете», когда нужно говорить","Хотите практику с живыми людьми, а не только видео","Готовы выйти на новый уровень вместе с группой","Хотите найти единомышленников и новых друзей"],
+      inside:[["🎧","Живой английский, а не учебник","Реальные видео и аудио: тот английский, на котором говорят в жизни."],["🗣","Вы говорите почти всё занятие","Фокус на говорении и разговорной грамматике."],["💬","Практика в парах","По 2 человека в комнате Zoom: говорите постоянно, а не ждёте очереди."],["👥","Группы до 8 человек","Каждого слышно, и не страшно ошибаться."],["📝","Разбор ваших ошибок","После занятия получаете свои ошибки с исправлениями."],["🎯","Группа под ваш уровень","Бесплатное 10-минутное интервью с Анастасией."]],
+      schedule:[["B1+ / B2","Пн, 20:00–21:30 МСК","Ведёт Анастасия",false],["B1+ / B2","Сб, 10:30–12:00 МСК","Преподаватель команды",true],["B2+ / C1","Вт, 19:00–20:30 МСК","Ведёт Анастасия",true]],
+      howto:[["Бесплатное интервью, 10 минут","Анастасия оценит ваш разговорный уровень и скажет, в какой группе вам будет комфортнее."],["Пробное занятие","Если вы проходите в группу, оплачиваете первое пробное занятие."],["Решаете сами","После пробного занятия решаете, заниматься ли дальше."]]
+    },
+    steps:[["Интервью, 10 минут","бесплатно"],["Пробное занятие","1 500 ₽"],["Абонемент на 4 занятия","6 000 ₽"]],
+    btn:"Записаться на бесплатное интервью", link:()=>dm("Хочу на бесплатное интервью в разговорный клуб Terrific Speaking"),
+    btn2:"Задать вопрос о клубе", link2:()=>dm("Здравствуйте! У меня вопрос о разговорном клубе Terrific Speaking") },
+  { id:"ind-anastasia", title:"Индивидуально с Анастасией TERRIFIC.ENG", price:"3 500 ₽", per:"60 минут",
+    teacher:["Уровень C2, подтверждён сертификатом Cambridge","Лингвист, МГЛУ им. Мориса Тореза","Быстро ставит разговорную речь и аудирование","Помогает вывести грамматику в живую речь","Работает со средними и высокими уровнями"],
+    info:{label:"Как проходят занятия", items:["Программа составляется под вас и ваши цели после бесплатного интервью","95% урока проходит на английском","Аутентичные материалы: подкасты, статьи, видео, книги. Без учебника","Ничего покупать не нужно: все материалы в электронном виде"]},
+    steps:[["Интервью","бесплатно"],["Первое занятие — пробное","3 500 ₽"],["Дальше оплата по 4 занятия","14 000 ₽"]],
+    btn:"Записаться на бесплатное интервью", link:()=>dm("Хочу на индивидуальные занятия с Анастасией TERRIFIC.ENG") },
+  { id:"ind-team", title:"Индивидуально с Анастасией Байкатовой", sub:"Преподаватель команды TERRIFIC.ENGLISH", price:"3 000 ₽", per:"60 минут",
+    teacher:["Уровень английского C1","Лингвист, КГУ: теория и методика преподавания иностранных языков и культур","Помогает быстро набрать уровень и поставить говорение и аудирование"],
+    info:{label:"Как проходят занятия", items:["Программа составляется под вас и ваши цели после бесплатного интервью","95% урока проходит на английском","Аутентичные материалы: подкасты, статьи, видео, книги, а при необходимости и учебник","Ничего покупать не нужно: все материалы в электронном виде"]},
+    steps:[["Интервью","бесплатно"],["Первое занятие — пробное","3 000 ₽"],["Дальше оплата по 4 занятия","12 000 ₽"]],
+    btn:"Записаться на бесплатное интервью", link:()=>dm("Хочу на индивидуальные занятия с Анастасией Байкатовой") },
+  { id:"gravity", title:"Курс по мультсериалу Gravity Falls", price:"", per:"",
+    text:"Разговорный американский английский на интерактивной платформе Progressme.",
+    chips:["🇺🇸 American English","Progressme"],
+    btn:"Подробнее о курсе", link:()=>CONFIG.site+"/gravity-falls" },
+  { id:"sweetpea", title:"Курс по сериалу Sweetpea", price:"", per:"",
+    text:"Разговорный британский английский по мини-сериалу Sweetpea на платформе Progressme.",
+    chips:["🇬🇧 British English","Progressme"],
+    btn:"Подробнее о курсе", link:()=>CONFIG.site+"/sweetpea" },
+];
+
+
+/* ============ ТЕСТ: 60 вопросов, по 10 на уровень (5 грамматика + 5 лексика) ============ */
+const AVA = "data:image/jpeg;base64,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";
+const LEVELS = ["A1","A2","B1","B2","C1","C2"];
+const Q = [
+ ["A1","She ___ a teacher.",["is","are","am","be"],0],
+ ["A1","I ___ coffee every morning.",["drinks","drink","drinking","am drink"],1],
+ ["A1","There ___ two apples on the table.",["is","be","are","has"],2],
+ ["A1","___ you like pizza?",["Are","Does","Is","Do"],3],
+ ["A1","My brother is ___ than me.",["taller","tall","tallest","more tall"],0],
+ ["A1","I wake up in the ___ and go to bed at night.",["morning", "evening", "afternoon", "week"],0,"v"],
+ ["A1","My mother’s sister is my ___ .",["cousin", "aunt", "niece", "uncle"],1,"v"],
+ ["A1","It’s cold outside. Put on your ___ .",["sunglasses", "shorts", "jacket", "sandals"],2,"v"],
+ ["A1","We eat soup with a ___ .",["knife", "fork", "plate", "spoon"],3,"v"],
+ ["A1","The opposite of “cheap” is ___ .",["expensive", "small", "new", "easy"],0,"v"],
+ ["A2","I ___ to Paris last summer.",["go","have gone","went","was go"],2],
+ ["A2","Look! It ___ .",["rains","is raining","rain","rained"],1],
+ ["A2","We ___ see that film tonight. We’ve already bought the tickets.",["are going to","would","going","will to"],0],
+ ["A2","You ___ wear a uniform at our school. It’s a rule.",["might","can","should","have to"],3],
+ ["A2","How ___ money do you have?",["many","much","lot","few"],1],
+ ["A2","Can you ___ me your pen, please?",["borrow", "lend", "take", "give back"],1,"v"],
+ ["A2","I’m really ___ in history. I read a lot about it.",["interesting", "boring", "interested", "bored"],2,"v"],
+ ["A2","We missed the bus, so we had to ___ a taxi.",["make", "do", "take", "ride"],2,"v"],
+ ["A2","Please ___ the light when you leave the room.",["turn off", "turn on", "take off", "put off"],0,"v"],
+ ["A2","I need to ___ some money from the cash machine.",["take off", "take up", "take out", "take over"],2,"v"],
+ ["B1","I’ve lived here ___ 2019.",["for","from","since","during"],2],
+ ["B1","If it rains tomorrow, we ___ at home.",["will stay","stay","would stay","stayed"],0],
+ ["B1","When I got to the cinema, the film ___ .",["has already started","already starts","was already start","had already started"],3],
+ ["B1","This bridge ___ in 1890.",["built","was built","has built","is building"],1],
+ ["B1","I’m not used to ___ up so early.",["get","got","getting","be got"],2],
+ ["B1","Could you ___ the children while I’m at the shop?",["look for", "look after", "look up", "look into"],1,"v"],
+ ["B1","He gave up smoking because it was bad for his ___ .",["health", "healthy", "heal", "healing"],0,"v"],
+ ["B1","I can’t ___ up my mind which dress to buy.",["take", "do", "get", "make"],3,"v"],
+ ["B1","Our flight was ___ because of the storm.",["cancelled", "removed", "deleted", "missed"],0,"v"],
+ ["B1","She’s very ___ : she always tells the truth.",["polite", "generous", "honest", "patient"],2,"v"],
+ ["B2","If I ___ more free time, I would travel more.",["had","have","would have","will have"],0],
+ ["B2","She asked me where ___ .",["did I live","I lived","do I live","I am live"],1],
+ ["B2","By this time next year, I ___ my degree.",["will finish","finish","am finishing","will have finished"],3],
+ ["B2","He ___ have left already: his coat is still here.",["mustn’t","shouldn’t","can’t","needn’t"],2],
+ ["B2","The concert was so loud. The music was absolutely ___ .",["deafening","noisy","very loud","loudly"],0],
+ ["B2","I’m so ___ under with work that I can’t meet tonight.",["buried", "snowed", "frozen", "rained"],1,"v"],
+ ["B2","No hard ___ : I’m not angry with you.",["emotions", "feelings", "thoughts", "moods"],1,"v"],
+ ["B2","Don’t worry, the exam will be a piece of ___ .",["cake", "pie", "bread", "candy"],0,"v"],
+ ["B2","Look on the bright ___ : at least nobody was hurt.",["part", "way", "side", "light"],2,"v"],
+ ["B2","We need to ___ the problem before it gets worse.",["speak", "tell", "say", "address"],3,"v"],
+ ["C1","If I had taken that job, I ___ in London now.",["would live","would be living","would have lived","will live"],1],
+ ["C1","___ tired, I went to bed early.",["Felt","To feel","Feeling","Having feel"],2],
+ ["C1","He is said ___ the best chef in town.",["being","that he is","be","to be"],3],
+ ["C1","I wish I ___ that to her. It was rude.",["hadn’t said","didn’t say","wouldn’t say","don’t say"],0],
+ ["C1","What I love about this city ___ the food.",["are","is","it’s","that"],1],
+ ["C1","Cut him some ___ : it’s only his first week at work.",["rope", "space", "slack", "time"],2,"v"],
+ ["C1","Moving abroad? The thought has never ___ my mind.",["crossed", "passed", "gone", "come"],0,"v"],
+ ["C1","The film was so ___ that I couldn’t stop thinking about it.",["thought-provoking", "thoughtful", "thinking", "thoughtless"],0,"v"],
+ ["C1","He’s a total ___ chaser: he’ll do anything for attention online.",["cloud", "crowd", "clout", "cloth"],2,"v"],
+ ["C1","It’s a hot-___ topic: everyone has a strong opinion about it.",["potato", "spot", "line", "button"],3,"v"],
+ ["C2","Never ___ such a mess in my life!",["I have seen","I saw","have I seen","did I saw"],2],
+ ["C2","___ you need any help, just give me a call.",["Should","Would","Unless","Had"],0],
+ ["C2","The new evidence ___ doubt on his version of events.",["threw","made","put","cast"],3],
+ ["C2","She never ___ her words: she always says exactly what she thinks.",["chops","minces","cuts","spares"],1],
+ ["C2","Hardly ___ the house when it started to pour.",["we had left","did we leave","had we left","we left"],2],
+ ["C2","Why does every new discovery have to be a cash ___ ?",["crash", "grab", "catch", "cow"],1,"v"],
+ ["C2","His explanation was so ___ that nobody could follow it.",["convoluted", "concise", "coherent", "candid"],0,"v"],
+ ["C2","She took the criticism in her ___ and carried on working.",["step", "pace", "stride", "walk"],2,"v"],
+ ["C2","The new law was met with widespread ___ from the public.",["opportunity", "oppression", "optimism", "opprobrium"],3,"v"],
+ ["C2","Stop beating about the ___ and tell me what happened.",["bush", "tree", "house", "point"],0,"v"]
+];
+const LEVEL_INFO = {
+  A1:{name:"Beginner",text:"Вы знаете базу: простые фразы, глагол to be, настоящее время. Самое время заговорить увереннее."},
+  A2:{name:"Elementary",text:"Вы справляетесь с бытовыми темами и прошедшим временем. Дальше нужно больше живой речи и новых слов."},
+  B1:{name:"Intermediate",text:"Вы можете поддержать разговор на знакомые темы. Пора расширить словарный запас и научиться говорить без пауз."},
+  B2:{name:"Upper-Intermediate",text:"Вы свободно общаетесь и понимаете много на слух. Следующий шаг: точность, идиомы и сложная грамматика в речи."},
+  C1:{name:"Advanced",text:"Вы владеете языком на продвинутом уровне. Осталось отточить нюансы, стиль и естественность."},
+  C2:{name:"Proficiency",text:"Уровень образованного носителя. Поддерживайте язык живым общением и сложными материалами."},
+};
+const RECS = {
+  A1:["ind-team"], A2:["ind-team"], B1:["gravity"],
+  B2:["sweetpea","gravity"], C1:["ind-anastasia"], C2:["gravity","ind-anastasia"]
+};
+const COMMUNITY_FOR = ["A2","B1","B2","C1"];
+const DAILY_LEVEL = {A1:"A2+ – B1",A2:"A2+ – B1",B1:"B1+ – B2",B2:"B1+ – B2",C1:"B2+ – C1",C2:"B2+ – C1"};
+
+/* ============ Telegram ============ */
+const tg = window.Telegram && window.Telegram.WebApp;
+if (tg) { try { tg.ready(); tg.expand(); } catch(e){} }
+document.addEventListener("click", (e) => {
+  const a = e.target.closest("a[href]"); if (!a || !tg) return;
+  const href = a.href; e.preventDefault();
+  try { href.startsWith("https://t.me/") ? tg.openTelegramLink(href) : tg.openLink(href); } catch(err){ location.href = href; }
+});
+const store = { get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}}, set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}} };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const app = document.getElementById("app");
+const chev = `<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>`;
+let openAcc = new Set();
+
+/* ============ ГЛАВНАЯ ============ */
+function courseCard(c){
+  return `<article class="course${c.feat?" feat":""}" id="c-${c.id}">
+    <div class="c-top"><h3>${esc(c.title)}${c.soon?` <span class="soon-b">скоро</span>`:""}</h3>${c.price?`<div class="price">${c.price}<small>${c.per}</small></div>`:""}</div>
+    ${c.sub?`<div class="sub">${esc(c.sub)}</div>`:""}
+    ${c.lead?`<div class="lead">${esc(c.lead)}</div>`:""}
+    ${c.text?`<p>${esc(c.text)}</p>`:""}
+    ${c.teacher?`<div class="folds">
+      <button class="more-btn" aria-expanded="false" id="t-${c.id}">О преподавателе ${chev}</button>
+      <div class="teacher" hidden><ul>${c.teacher.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>
+      <button class="more-btn" aria-expanded="false" id="i-${c.id}">${esc(c.info.label)} ${chev}</button>
+      <div class="teacher" hidden><ul>${c.info.items.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>
+    </div>`:""}
+    ${c.levels?`<div class="lvls"><span class="lvls-l">Уровни</span>${c.levels.map(x=>`<span class="lvl">${esc(x)}</span>`).join("")}</div>`:""}
+    ${c.inside?`<button class="more-btn" aria-expanded="false" id="in-${c.id}">Подробнее: что внутри ${chev}</button>
+    <div class="lock-grid" hidden>${c.inside.map(x=>`<div>${esc(x)}</div>`).join("")}</div>`:""}
+    ${c.chips?`<div class="chips">${c.chips.map(x=>`<span>${esc(x)}</span>`).join("")}</div>`:""}
+    ${c.steps?`<div class="steps">${c.steps.map(s=>`<div><span>${s[0]}</span><b>${s[1]}</b></div>`).join("")}</div>`:""}
+    ${c.more?`<button class="more-btn" aria-expanded="false" id="more-${c.id}">Подробнее о клубе ${chev}</button>
+    <div class="more" hidden>
+      <div><h4>Для кого</h4><ul>${c.more.who.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>
+      <div><h4>Что внутри</h4><div class="feat-list">${c.more.inside.map(f=>`<div><span class="e">${f[0]}</span><span><b>${esc(f[1])}</b><p>${esc(f[2])}</p></span></div>`).join("")}</div></div>
+      <div><h4>Расписание</h4><div class="sched">${c.more.schedule.map(s=>`<div><span class="lv">${s[0]}</span><span>${s[1]}</span><span class="st ${s[3]?"yes":"no"}">${s[3]?"есть места":"мест нет"}</span><small>${esc(s[2])}</small></div>`).join("")}</div></div>
+      <div><h4>Как попасть в группу</h4><div class="howto">${c.more.howto.map(h=>`<div><span><b>${esc(h[0])}</b><p>${esc(h[1])}</p></span></div>`).join("")}</div></div>
+    </div>`:""}
+    ${c.soon?`<button class="btn btn-off" disabled aria-disabled="true">${esc(c.btn)}</button>`:`<a class="btn ${c.feat||c.more||c.teacher?"btn-pink":"btn-ghost"}" href="${esc(c.link())}" target="_blank" rel="noopener">${esc(c.btn)}</a>`}
+    ${c.btn2?`<a class="btn btn-ghost" href="${esc(c.link2())}" target="_blank" rel="noopener">${esc(c.btn2)}</a>`:""}
+  </article>`;
+}
+function bindMore(){
+  app.querySelectorAll(".more-btn").forEach(b=>b.onclick=()=>{
+    const box=b.nextElementSibling, open=box.hidden; box.hidden=!open; b.setAttribute("aria-expanded",open);
+  });
+}
+function home(){
+  const last = store.get("te-result");
+  app.innerHTML = `
+  <section class="hero">
+    <div class="who">
+      <img class="ava" src="${AVA}" alt="Анастасия" width="128" height="128">
+      <div><h1>TERRIFIC ENGLISH CHANNEL</h1><div class="subs">1 759 подписчиков</div></div>
+    </div>
+    <p>Здесь настоящий английский. Прокачаю твой уровень с помощью фильмов, сериалов и книг</p>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head"><h2>Бесплатно в канале</h2><span class="tag">открыто всем</span></div>
+    <div class="testcard">
+      <div class="eyebrow">Бесплатно · 60 вопросов · 15 минут</div>
+      <h3>🎯 Узнайте свой уровень английского</h3>
+      <p>Грамматика и лексика от A1 до C2. В конце покажу ваш уровень и подскажу дальнейшие шаги, чтобы прокачать английский.</p>
+      <div class="scale">${LEVELS.map(l=>`<span class="${last&&last.level===l?"on":""}">${l}</span>`).join("")}</div>
+      <button class="btn btn-pink" id="startTest">${last?"Пройти тест ещё раз":"Пройти тест"}</button>
+      ${last?`<div class="last">Ваш прошлый результат: <b>${last.level}</b>, ${last.score} из 60</div>`:""}
+    </div>
+    ${RUBRICS.map((r,i)=>`
+      <div class="acc${openAcc.has(i)?" open":""}" data-i="${i}">
+        <button class="acc-btn" aria-expanded="${openAcc.has(i)}" id="acc-${i}">
+          <span class="acc-ico">${r.icon}</span>
+          <span class="acc-t"><b>${esc(r.title)}</b><small>${esc(r.sub)} · ${r.items.length}</small></span>${chev}
+        </button>
+        <div class="acc-list" ${openAcc.has(i)?"":"hidden"}>
+          ${r.items.map(it=> it.link
+            ? `<a href="${esc(it.link)}" target="_blank" rel="noopener"><span class="t">${esc(it.t)}</span><span class="arrow">→</span></a>`
+            : `<div class="soon"><span class="t">${esc(it.t)}</span><em>скоро</em></div>`).join("")}
+        </div>
+      </div>`).join("")}
+  </section>
+
+  <section class="sec">
+    <div class="sec-head"><h2>Курсы и занятия</h2></div>
+    ${COURSES.map(courseCard).join("")}
+  </section>
+
+
+  <footer class="foot">
+    <a class="btn btn-ghost" href="${esc(dm("Здравствуйте! У меня вопрос"))}" target="_blank" rel="noopener">✉️ Задать вопрос</a>
+    <span>Сайт: <a href="${CONFIG.site}" target="_blank" rel="noopener">terrific-eng.ru</a></span>
+  </footer>`;
+  document.getElementById("startTest").onclick = startTest;
+  bindMore();
+  app.querySelectorAll(".acc-btn").forEach(b=>b.onclick=()=>{
+    const box=b.parentElement, i=+box.dataset.i, list=box.querySelector(".acc-list");
+    const open=!box.classList.contains("open"); box.classList.toggle("open",open); list.hidden=!open; b.setAttribute("aria-expanded",open);
+    open?openAcc.add(i):openAcc.delete(i);
+  });
+}
+
+/* ============ ТЕСТ ============ */
+let qi=0, answers=[];
+function startTest(){ qi=0; answers=[]; question(); window.scrollTo(0,0); }
+function question(){
+  const [lvl,text,opts,,kind] = Q[qi];
+  const html = esc(text).replace("___",'<span class="gap"></span>');
+  app.innerHTML = `
+  <div class="qhead">
+    <button class="back" id="qBack" aria-label="Назад">←</button>
+    <div class="bar"><i style="width:${qi/Q.length*100}%"></i></div>
+    <div class="qnum">${qi+1} / ${Q.length}</div>
+  </div>
+  <div class="qcard">
+    <span class="tag qlevel">${kind==="v"?"Vocabulary":"Grammar"} · choose the correct option</span>
+    <div class="qtext">${html}</div>
+    <div class="opts">${opts.map((o,k)=>`<button class="opt${answers[qi]===k?" picked":""}" data-k="${k}" id="opt-${k}">${esc(o)}</button>`).join("")}</div>
+  </div>
+  <p class="hint">Не знаете ответ? Не угадывайте: выберите вариант, который кажется верным, тест сам подстроится под результат.</p>`;
+  document.getElementById("qBack").onclick=()=>{ if(qi===0) home(); else { qi--; question(); } };
+  app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+    answers[qi]=+b.dataset.k; b.classList.add("picked");
+    try{ tg && tg.HapticFeedback && tg.HapticFeedback.selectionChanged(); }catch(e){}
+    setTimeout(()=>{ qi++; qi<Q.length?question():result(); },220);
+  });
+}
+function grade(){
+  const per = Object.fromEntries(LEVELS.map(l=>[l,0])); let score=0;
+  Q.forEach((q,i)=>{ if(answers[i]===q[3]){ per[q[0]]++; score++; } });
+  // уровень = последний, где 6+ из 10 и все ниже тоже 6+ (с одной поблажкой)
+  let level="A1", slips=0;
+  for(const l of LEVELS){ if(per[l]>=6) level=l; else if(per[l]===5 && slips===0){ slips++; } else break; }
+  return {score, per, level};
+}
+/* Разговорный клуб: какая группа подойдёт по результату теста */
+function clubGroup(r){
+  if(r.level==="A1"||r.level==="A2"||r.level==="C2") return null;
+  if(r.level==="B1") return "B1+ / B2";
+  if(r.level==="B2") return (r.per.B2>=8 || r.per.C1>=5) ? "B2+ / C1" : "B1+ / B2";
+  return "B2+ / C1";
+}
+function clubBlock(r){
+  const sp = COURSES.find(c=>c.id==="speaking");
+  const g = clubGroup(r);
+  if(!g) return "";
+  const who = g==="B1+ / B2" ? "для тех, у кого любой B1 или начальный B2" : "для тех, у кого B2 или начальный C1";
+  const slots = sp.more.schedule.filter(s=>s[0]===g);
+  return `<section class="club">
+    <h3 class="big-t">Вам подойдёт группа <span class="lvl">${g}</span></h3>
+    <p>Разговорный клуб Terrific Speaking. Группа ${esc(who)}. Точно подтвердим на бесплатном 10-минутном интервью с Анастасией.</p>
+    <div class="sched">${slots.map(s=>`<div><span class="lv">${s[0]}</span><span>${s[1]}</span><span class="st ${s[3]?"yes":"no"}">${s[3]?"есть места":"мест нет"}</span><small>${esc(s[2])}</small></div>`).join("")}</div>
+    <div class="steps">${sp.steps.map(s=>`<div><span>${s[0]}</span><b>${s[1]}</b></div>`).join("")}</div>
+    <button class="btn btn-pink" id="toClub">Узнать больше</button>
+  </section>`;
+}
+function communityBlock(r){
+  if(!COMMUNITY_FOR.includes(r.level)) return "";
+  const c = COURSES.find(x=>x.id==="daily");
+  return `<section class="club">
+    <h3 class="big-t">TERRIFIC COMMUNITY <span class="soon-b">скоро</span></h3>
+    <div class="sub-t">Английский каждый день в закрытом канале · ${c.price} в месяц</div>
+    <div class="lvls"><span class="lvls-l">Ваш уровень</span><span class="lvl">${DAILY_LEVEL[r.level]}</span></div>
+    <p>${esc(c.text)}</p>
+    <button class="btn btn-pink" id="toCommunity">Узнать больше</button>
+  </section>`;
+}
+/* открыть главную на карточке TERRIFIC COMMUNITY с раскрытым «что внутри» */
+function showCommunity(){ showCourse("daily"); }
+function showCourse(id){
+  home();
+  const card=document.getElementById("c-"+id); if(!card) return;
+  const btn=card.querySelector(".more-btn"); if(btn && btn.getAttribute("aria-expanded")!=="true") btn.click();
+  card.scrollIntoView({block:"start"});
+}
+function result(){
+  const r = grade(); store.set("te-result",{level:r.level,score:r.score});
+  const info = LEVEL_INFO[r.level];
+  const recs = RECS[r.level].map(id=>COURSES.find(c=>c.id===id));
+  const extra = !!(clubGroup(r) || COMMUNITY_FOR.includes(r.level));
+  const shareText = `Мой уровень английского по тесту terrific.eng: ${r.level} (${info.name})! Проверь свой:`;
+  const share = `https://t.me/share/url?url=${encodeURIComponent(CONFIG.appLink)}&text=${encodeURIComponent(shareText)}`;
+  app.innerHTML = `
+  <div class="qhead"><button class="back" id="rBack" aria-label="На главную">←</button><div class="eyebrow">Ваш результат</div></div>
+  <section class="res">
+    <div class="big">${r.level}</div>
+    <div class="name">${info.name} · ${r.score} из 60</div>
+    <p>${info.text}</p>
+    <div class="ladder">${LEVELS.map(l=>`<div class="${l===r.level?"me":""}"><i><b style="height:${r.per[l]/10*100}%"></b></i>${l}<span style="font-weight:500">${r.per[l]}/10</span></div>`).join("")}</div>
+    <div class="row-btns">
+      <a class="btn btn-pink" href="${esc(share)}" target="_blank" rel="noopener">Поделиться результатом</a>
+      <button class="btn btn-ghost" id="again">Пройти ещё раз</button>
+    </div>
+  </section>
+  ${clubBlock(r)}
+  ${communityBlock(r)}
+  <section class="sec">
+    <div class="sec-head"><h2>${extra?"Что ещё вам подойдёт":"Вам подойдёт"}</h2></div>
+    <div class="rec">${recs.map(courseCard).join("")}</div>
+  </section>`;
+  document.getElementById("rBack").onclick=()=>{home();window.scrollTo(0,0)};
+  document.getElementById("again").onclick=startTest;
+  const tc=document.getElementById("toCommunity"); if(tc) tc.onclick=showCommunity;
+  const tk=document.getElementById("toClub"); if(tk) tk.onclick=()=>showCourse("speaking");
+  bindMore();
+  window.scrollTo(0,0);
+}
+home();
+</script>
+
+</body>
+</html>
