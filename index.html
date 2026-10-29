@@ -8,6 +8,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Onest:wght@400;500;600;700&display=swap">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<!-- Yandex.Metrika counter -->
+<script>
+(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();
+for(var j=0;j<document.scripts.length;j++){if(document.scripts[j].src===r){return;}}
+k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+(window,document,"script","https://mc.yandex.ru/metrika/tag.js","ym");
+ym(113898799,"init",{clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:true});
+</script>
+<!-- /Yandex.Metrika counter -->
+
 <style>
 /* Layout: one phone-width column; pink test card on top, then free rubrics as accordions, paid courses, locked club tiles */
 :root{
@@ -366,6 +376,17 @@ const RECS = {
 const COMMUNITY_FOR = ["A2","B1","B2","C1"];
 const DAILY_LEVEL = {A1:"A2+ – B1",A2:"A2+ – B1",B1:"B1+ – B2",B2:"B1+ – B2",C1:"B2+ – C1",C2:"B2+ – C1"};
 
+/* ============ Яндекс Метрика: цели ============ */
+function track(goal, params){ try{ window.ym && ym(113898799,"reachGoal",goal,params||{}); }catch(e){} }
+document.addEventListener("click",(e)=>{
+  const a=e.target.closest("a[href]"); if(!a) return;
+  const h=a.href;
+  if(h.includes("t.me/"+CONFIG.contact)) track("contact_click",{text:a.textContent.trim()});
+  else if(h.includes("t.me/c/")) track("post_open",{title:a.textContent.trim()});
+  else if(h.includes("t.me/share")) track("share_result");
+  else if(h.includes("terrific-eng.ru")) track("site_open",{text:a.textContent.trim()});
+}, true);
+
 /* ============ Telegram ============ */
 const tg = window.Telegram && window.Telegram.WebApp;
 if (tg) { try { tg.ready(); tg.expand(); } catch(e){} }
@@ -470,7 +491,7 @@ function home(){
 
 /* ============ ТЕСТ ============ */
 let qi=0, answers=[];
-function startTest(){ qi=0; answers=[]; question(); window.scrollTo(0,0); }
+function startTest(){ track("test_start"); qi=0; answers=[]; question(); window.scrollTo(0,0); }
 function question(){
   const [lvl,text,opts,,kind] = Q[qi];
   const html = esc(text).replace("___",'<span class="gap"></span>');
@@ -543,6 +564,7 @@ function showCourse(id){
 }
 function result(){
   const r = grade(); store.set("te-result",{level:r.level,score:r.score});
+  track("test_finish",{level:r.level,score:r.score});
   const info = LEVEL_INFO[r.level];
   const recs = RECS[r.level].map(id=>COURSES.find(c=>c.id===id));
   const extra = !!(clubGroup(r) || COMMUNITY_FOR.includes(r.level));
@@ -568,8 +590,8 @@ function result(){
   </section>`;
   document.getElementById("rBack").onclick=()=>{home();window.scrollTo(0,0)};
   document.getElementById("again").onclick=startTest;
-  const tc=document.getElementById("toCommunity"); if(tc) tc.onclick=showCommunity;
-  const tk=document.getElementById("toClub"); if(tk) tk.onclick=()=>showCourse("speaking");
+  const tc=document.getElementById("toCommunity"); if(tc) tc.onclick=()=>{track("community_more",{level:r.level});showCommunity();};
+  const tk=document.getElementById("toClub"); if(tk) tk.onclick=()=>{track("club_more",{level:r.level});showCourse("speaking");};
   bindMore();
   window.scrollTo(0,0);
 }
