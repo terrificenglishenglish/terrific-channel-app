@@ -385,7 +385,7 @@ function renderHome(){
       </div>
       <div class="tile" onclick="go({name:'fresh'})">
         <div class="ico" style="background:#e3f0fd">🆕</div>
-        <div><h3>Новое за неделю</h3><p>Видео, карточки и рабочая тетрадь вашего уровня</p></div><span class="arrow">›</span>
+        <div><h3>Новое за неделю</h3><p>Видео или аудио, карточки и рабочая тетрадь вашего уровня</p></div><span class="arrow">›</span>
       </div>
       <div class="tile" onclick="go({name:'levels'})">
         <div class="ico" style="background:#fdeee3">📚</div>
@@ -408,7 +408,7 @@ function renderHome(){
         <div><h3>Задать вопрос</h3><p>Напишите нам: @terrificenglish</p></div><span class="arrow">›</span>
       </div>
     </div>
-    <footer>Made with ❤️ by ${esc(CONFIG.author)} · версия 31.10</footer>`;
+    <footer>Made with ❤️ by ${esc(CONFIG.author)} · версия 31.10.2</footer>`;
 }
 
 function renderLevels(){
@@ -442,7 +442,7 @@ function renderHub(v){
     <div class="grid">
       <div class="tile" onclick="go({name:'topics',level:'${v.level}'})">
         <div class="ico" style="background:${L.color}">🎬</div>
-        <div><h3>Видео по темам</h3><p>${nv} материалов</p></div><span class="arrow">›</span></div>
+        <div><h3>Материалы по темам</h3><p>${nv} материалов</p></div><span class="arrow">›</span></div>
       <div class="tile" onclick="go({name:'grammar',level:'${v.level}'})">
         <div class="ico" style="background:${L.color}">🧩</div>
         <div><h3>Грамматика</h3><p>Программа на ${ng} недель</p></div><span class="arrow">›</span></div>
@@ -468,7 +468,7 @@ function renderTopics(v){
   const topics = [...new Set(MATERIALS.filter(m=>m.level===v.level).map(m=>m.topic))];
   app.innerHTML = `${backBtn()}
     <span class="tag" style="background:${L.color};color:${L.fg}">${esc(L.name)}</span>
-    <h2 style="margin-top:8px">🎬 Видео по темам</h2>
+    <h2 style="margin-top:8px">📚 Материалы по темам</h2>
     <div class="grid">
       ${topics.length ? topics.map(t=>{
         const n = MATERIALS.filter(m=>m.level===v.level && m.topic===t).length;
@@ -486,7 +486,7 @@ function itemsHtml(list, showLevel){
     <div class="item" onclick="go({name:'mat',i:${idx(m)}})">
       <div class="play">▶</div>
       <div><b>${esc(m.title)}</b>
-      <small>${showLevel?esc(lvl(m.level).name)+" · "+esc(m.topic)+" · ":""}${m.date?"неделя с "+fmtDate(m.date)+" · ":""}видео, карточки, тетрадь</small></div>
+      <small>${showLevel?esc(lvl(m.level).name)+" · "+esc(m.topic)+" · ":""}${m.date?"неделя с "+fmtDate(m.date)+" · ":""}${isAudio(m)?"аудио":"видео"}, карточки, тетрадь</small></div>
     </div>`).join("")}</div>`;
 }
 
@@ -501,6 +501,7 @@ function renderList(v){
 function isFresh(d){ const t=Date.parse(d); return !isNaN(t) && (Date.now()-t) < 7*864e5 && t <= Date.now()+864e5; }
 function addDays(d,n){ const t=new Date(d+"T12:00:00"); t.setDate(t.getDate()+n); return t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0"); }
 const WD=["вс","пн","вт","ср","чт","пт","сб"];
+const isAudio = m => /ауди|audio|podcast|подкаст/i.test(m.format||"");
 function weekBlock(m){
   const L=lvl(m.level), mi=MATERIALS.indexOf(m), key=s=>String(s).trim().toLowerCase();
   const parts = PART_NAMES.map((nm,i)=>{
@@ -516,7 +517,7 @@ function weekBlock(m){
       <span class="tag" style="background:${L.color};color:${L.fg}">${esc(L.name)}</span>
       <h3 style="margin:8px 0 2px">${TOPIC_ICONS[m.topic]||"📌"} ${esc(m.title)}</h3>
       <p class="muted" style="margin:0 0 6px;font-size:13px">${esc(m.topic)}${m.date?" · неделя с "+fmtDate(m.date):""}</p>
-      <div class="item ${m.link?"":"soon"}" onclick="${m.link?`openLink(MATERIALS[${mi}].link)`:""}"><div class="play">▶</div><div><b>Видео недели</b><small>${m.link?"смотреть":"скоро"}</small></div></div>
+      <div class="item ${m.link?"":"soon"}" onclick="${m.link?`openLink(MATERIALS[${mi}].link)`:""}"><div class="play">${isAudio(m)?"🎧":"▶"}</div><div><b>${isAudio(m)?"Аудио недели":"Видео недели"}</b><small>${m.link?(isAudio(m)?"слушать":"смотреть"):"скоро"}</small></div></div>
       ${hasCards?`<div class="item" onclick="go({name:'cardsMode',level:'${m.level}'})"><div class="play" style="background:#fde3f1;color:var(--accent);font-size:16px">🃏</div><div><b>Карточки: слова недели</b><small>перейти в «Учить слова»</small></div></div>`:""}
       <p style="margin:12px 0 0;font-weight:800;font-size:14px">📒 Рабочая тетрадь</p>
       ${parts}
@@ -744,7 +745,8 @@ async function loadSheet(){
     const rows = parseCSV(await r.text()); const h = rows.shift().map(x=>x.trim().toLowerCase());
     const col = n => h.indexOf(n);
     const data = rows.map(r=>({level:normLevel(r[col("level")]), topic:(r[col("topic")]||"").trim(),
-      title:(r[col("title")]||"").trim(), link:(r[col("link")]||"").trim(), date:(r[col("date")]||"").trim()}))
+      title:(r[col("title")]||"").trim(), link:(r[col("link")]||"").trim(), date:(r[col("date")]||"").trim(),
+      format:(col("format")>=0?(r[col("format")]||""):"").trim()}))
       .filter(m=>m.level && m.topic && m.title);
     if(data.length){ MATERIALS = data; render(); }
   }catch(e){}
