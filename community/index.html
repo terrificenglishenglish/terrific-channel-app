@@ -1,0 +1,788 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Terrific English</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: var(--tg-theme-bg-color, #fbf8f4);
+    --card: var(--tg-theme-secondary-bg-color, #ffffff);
+    --text: var(--tg-theme-text-color, #1d1a17);
+    --muted: var(--tg-theme-hint-color, #8a8178);
+    --accent: #fd1796;
+    --accent-2: #ff6cbf;
+    --ok: #2f9e6b;
+    --bad: #d6453d;
+    --line: rgba(127,127,127,.18);
+    --radius: 18px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;background:var(--bg);color:var(--text);font-family:Manrope,system-ui,-apple-system,sans-serif;}
+  body{min-height:100vh}
+  .wrap{max-width:560px;margin:0 auto;padding:20px 16px 40px}
+  .hero{background:radial-gradient(120% 90% at 100% 0%,#5a0a38 0%,#1a0b14 60%);color:#fff;border-radius:24px;padding:22px 20px;margin-bottom:18px;position:relative;overflow:hidden}
+  .hero:after{content:"";position:absolute;right:-50px;top:-50px;width:170px;height:170px;border-radius:50%;background:rgba(253,23,150,.25);filter:blur(10px)}
+  .hero .logo{display:block;width:150px;height:auto;margin:0 auto 10px;position:relative;z-index:1}
+  .hero > *{position:relative;z-index:1}
+  .hero.center{text-align:center}
+  .badge{background:rgba(253,23,150,.35)!important}
+  .hero small{opacity:.9;font-weight:700;letter-spacing:.04em;text-transform:uppercase;font-size:11px}
+  .hero h1{margin:6px 0 4px;font-size:24px;line-height:1.2}
+  .hero p{margin:0;opacity:.95;font-size:14px}
+  .badge{display:inline-block;margin-top:12px;background:rgba(255,255,255,.22);padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700}
+  h2{font-size:18px;margin:22px 0 10px}
+  .grid{display:grid;gap:12px}
+  .tile{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;display:flex;gap:14px;align-items:center;cursor:pointer;transition:transform .12s}
+  .tile:active{transform:scale(.98)}
+  .tile.big{background:linear-gradient(135deg,#fd1796,#c20f72);color:#fff;border:0}
+  .tile.big p{color:rgba(255,255,255,.8)}
+  .ico{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-size:24px;flex:none}
+  .tile h3{margin:0 0 3px;font-size:16px}
+  .tile p{margin:0;color:var(--muted);font-size:13px}
+  .tile .arrow{margin-left:auto;color:var(--muted);font-size:20px}
+  .tile.big .arrow{color:#fff}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+  .muted{color:var(--muted)}
+  .btn{display:block;width:100%;border:0;border-radius:14px;padding:15px;font:inherit;font-weight:700;font-size:15px;background:var(--accent);color:#fff;cursor:pointer;margin-top:12px;text-align:center;text-decoration:none}
+  .btn.ghost{background:transparent;color:var(--accent);border:1.5px solid var(--accent)}
+  .btn.dark{background:linear-gradient(135deg,#fd1796,#c20f72)}
+  .progress{height:6px;background:var(--line);border-radius:6px;overflow:hidden;margin:6px 0 16px}
+  .progress i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));transition:width .3s}
+  .q{font-size:18px;font-weight:700;line-height:1.4;margin:6px 0 16px}
+  .opt{display:block;width:100%;text-align:left;background:var(--card);border:1.5px solid var(--line);color:var(--text);border-radius:14px;padding:14px;margin-bottom:10px;font:inherit;font-size:15px;cursor:pointer}
+  .result{text-align:center;padding:26px 16px}
+  .level{font-size:64px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1}
+  .back{display:block;background:none;border:0;color:var(--accent);font:inherit;font-weight:700;padding:0;margin-bottom:14px;cursor:pointer}
+  .tag{display:inline-block;font-size:11px;font-weight:700;padding:4px 8px;border-radius:8px;background:rgba(127,127,127,.12);color:var(--muted);margin-right:6px}
+  .lvl{font-weight:800;font-size:15px;flex:none;width:64px;height:48px;border-radius:14px;display:grid;place-items:center}
+  .item{display:flex;gap:12px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line);cursor:pointer}
+  .item:last-child{border-bottom:0}
+  .item .play{width:38px;height:38px;border-radius:50%;background:rgba(253,23,150,.12);color:var(--accent);display:grid;place-items:center;flex:none;font-size:14px}
+  .item b{font-size:15px;display:block}
+  .item small{color:var(--muted);font-size:12px}
+  .item.soon{opacity:.5;cursor:default}
+  ul.list{padding-left:20px;margin:8px 0}
+  ul.list li{margin:6px 0}
+  .grp{display:flex;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+  .grp:last-child{border-bottom:0}
+  .grp b{display:block;font-size:15px}
+  .grp small{color:var(--muted);font-size:13px;display:block;margin-top:2px}
+  .pill{flex:none;align-self:center;font-size:11px;font-weight:800;padding:5px 9px;border-radius:999px;background:rgba(47,158,107,.14);color:var(--ok);white-space:nowrap}
+  .pill.full{background:rgba(127,127,127,.14);color:var(--muted)}
+  .step{display:flex;gap:12px;padding:10px 0}
+  .step .n{flex:none;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;display:grid;place-items:center;font-size:14px}
+  .step p{margin:3px 0 0;color:var(--muted);font-size:14px}
+  .price{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);font-size:15px}
+  .price:last-child{border-bottom:0}
+  .price b{color:var(--accent)}
+  .fc{perspective:1000px;margin:6px 0 14px;cursor:pointer}
+  .fc-in{position:relative;min-height:260px;transition:transform .45s;transform-style:preserve-3d}
+  .fc.flip .fc-in{transform:rotateY(180deg)}
+  .fc.flip .fc-f,.fc:not(.flip) .fc-b{pointer-events:none}
+  .fc-f,.fc-b{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:22px;padding:22px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+  .fc-f{background:linear-gradient(135deg,#fd1796,#c20f72);color:#fff}
+  .fc-b{background:var(--card);border:1.5px solid var(--line);transform:rotateY(180deg)}
+  .fc-w{font-size:26px;font-weight:800;line-height:1.2}
+  .fc-h{font-size:12px;opacity:.8;margin-top:14px}
+  .fc-t{font-size:20px;font-weight:700;margin-bottom:14px}
+  .fc-e{font-size:15px;color:var(--muted);line-height:1.5}
+  .gap{display:inline-block;min-width:70px;border-bottom:2px dashed var(--accent);color:var(--accent);font-weight:700;cursor:pointer}
+  .say{background:rgba(255,255,255,.2);border:0;color:#fff;border-radius:999px;padding:8px 14px;font:inherit;font-weight:700;margin-top:16px;cursor:pointer}
+  .row2{display:flex;gap:10px}.row2 .btn{margin-top:0}
+  .seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px;margin:4px 0 14px}
+  .seg button{flex:1;border:0;background:none;font:inherit;font-weight:700;padding:10px;border-radius:10px;color:var(--muted);cursor:pointer}
+  .seg button.on{background:var(--accent);color:#fff}
+  .stat{display:flex;gap:12px}.stat .card{flex:1;text-align:center}
+  .stat b{display:block;font-size:30px;color:var(--accent)}
+  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:28px}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+/* =================================================================
+   НАСТРОЙКИ — меняйте здесь
+   ================================================================= */
+const CONFIG = {
+  author: "Анастасия Петрова",
+  brand: "Terrific English",
+  // Куда ведёт кнопка «Записаться в клуб» (ваш личный ник, бот или форма)
+  clubSignupLink: "https://t.me/terrificenglish",
+  // Куда ведёт «Задать вопрос»
+  askLink: "https://t.me/terrificenglish",
+  // Ссылка на канал / бота для кнопки «Поделиться»
+  shareLink: "https://t.me/tribute/app?startapp=s19Vi",
+  // НЕОБЯЗАТЕЛЬНО: ссылка на Google-таблицу, опубликованную как CSV.
+  // Если указать — материалы будут подтягиваться из таблицы автоматически,
+  // и код больше трогать не нужно. Столбцы: level | topic | title | link | date
+  sheetCsvUrl: "https://docs.google.com/spreadsheets/d/1XyjsH2U3G-7RT7eT3hHp2xOh3_UZjuDFp0wGyHL1e0Q/gviz/tq?tqx=out:csv&sheet=Untitled",
+  // карточки — лист cards той же таблицы
+  cardsCsvUrl: "https://docs.google.com/spreadsheets/d/1XyjsH2U3G-7RT7eT3hHp2xOh3_UZjuDFp0wGyHL1e0Q/gviz/tq?tqx=out:csv&sheet=cards",
+  // части рабочей тетради — лист parts: level | title | part | name | date | link (ссылка на пост)
+  partsCsvUrl: "https://docs.google.com/spreadsheets/d/1XyjsH2U3G-7RT7eT3hHp2xOh3_UZjuDFp0wGyHL1e0Q/gviz/tq?tqx=out:csv&sheet=parts"
+};
+/* 7 частей недели (суббота → пятница) */
+const PART_NAMES = ["Introduction","Word Practice","Grammar Focus","New Words","Vocabulary Boost","Video Review","Final Task: My Story"];
+const PART_ICONS = ["🎬","🧠","🧩","✨","💪","🔁","🏆"];
+let PARTS = [];
+
+/* Три уровня материалов */
+const LEVELS = [
+  {id:"1", name:"A2+ – B1", desc:"Уверенная база → свободное общение", color:"#e8f5ee", fg:"#2f9e6b"},
+  {id:"2", name:"B1+ – B2", desc:"Говорим свободно и без ошибок",      color:"#fff1d6", fg:"#c27c0e"},
+  {id:"3", name:"B2+ – C1", desc:"Звучим как носитель",                 color:"#f3e9fb", fg:"#7b3fb0"},
+];
+
+/* Темы (иконки) — если появится новая тема, добавьте её сюда */
+const TOPIC_ICONS = {
+  "Здоровье":"🩺", "Спорт":"🏋️", "Путешествия":"✈️", "Работа":"💼",
+  "Еда":"🍝", "Хобби":"🎨", "Отношения":"💬", "Фильмы и сериалы":"🎬", "Грамматика":"🧩"
+};
+
+/* МАТЕРИАЛЫ. Каждая строка — одно видео/пост в канале.
+   level: "1" / "2" / "3"   link: ссылка на пост (нажмите на пост → «Копировать ссылку»)
+   date: ГГГГ-ММ-ДД — по ней приложение само собирает блок «Новое».
+   Пока здесь примеры: замените на ваши посты. */
+let MATERIALS = [
+  // пример: {level:"1", topic:"Спорт", title:"Trainer for cyclists", link:"https://t.me/c/…", date:"2026-10-24"},
+];
+
+/* ГРАММАТИКА — общий список для всех. cefr — для кого тема (показывается в приложении).
+   level и week — для недельного плана заданий. link: ссылка на пост с уроком в канале. */
+let GRAMMAR = [
+  {level:"1", week:1, title:"Question forms: subject & object questions", cefr:"A2", example:"Who called you? — Who did you call?", link:""},
+  {level:"1", week:2, title:"Past Simple vs Past Continuous", cefr:"A2", example:"I was cooking dinner when you called.", link:""},
+  {level:"1", week:3, title:"Present Perfect vs Past Simple", cefr:"A2–B1", example:"I've been to London twice. I went there last year.", link:""},
+  {level:"1", week:4, title:"Present Perfect: just / already / yet, for / since", cefr:"A2", example:"I've just finished. Have you done it yet?", link:""},
+  {level:"1", week:5, title:"Future: will / going to / Present Continuous", cefr:"A2", example:"I'm meeting Kate tomorrow. It's going to rain.", link:""},
+  {level:"1", week:6, title:"Comparatives & Superlatives, as… as", cefr:"A1–A2", example:"This café is much cosier than the last one.", link:""},
+  {level:"1", week:7, title:"Modals: can / must / have to / should", cefr:"A2", example:"You should try it — you don't have to pay.", link:""},
+  {level:"1", week:8, title:"Much / many / a lot of / a few / a little", cefr:"A1–A2", example:"There isn't much time, but we have a few ideas.", link:""},
+  {level:"1", week:9, title:"So do I / Neither do I / Me too / Me neither / either", cefr:"A2–B1", example:"— I love coffee. — So do I. — I don't like tea. — Me neither.", link:""},
+  {level:"1", week:10, title:"First Conditional + when / as soon as", cefr:"A2–B1", example:"If you come early, we'll grab a coffee.", link:""},
+  {level:"1", week:11, title:"Gerund vs Infinitive (basic)", cefr:"A2", example:"I enjoy cooking, but I want to learn to bake.", link:""},
+  {level:"1", week:12, title:"Used to for past habits", cefr:"A2–B1", example:"I used to hate vegetables.", link:""},
+  {level:"1", week:13, title:"Passive: Present, Past & Future Simple", cefr:"B1", example:"This bridge was built in 1890. The new park will be opened next year.", link:""},
+  {level:"2", week:1, title:"Present Perfect Continuous vs Present Perfect", cefr:"B1", example:"I've been learning English for five years.", link:""},
+  {level:"2", week:2, title:"Narrative tenses: Past Perfect & Past Perfect Continuous", cefr:"B1", example:"By the time I got there, they had already left.", link:""},
+  {level:"2", week:3, title:"Future Continuous & Future Perfect", cefr:"B2", example:"This time tomorrow I'll be flying to Rome.", link:""},
+  {level:"2", week:4, title:"Second Conditional", cefr:"B1", example:"If I had more free time, I'd travel more.", link:""},
+  {level:"2", week:5, title:"Third Conditional", cefr:"B1–B2", example:"If I had known, I would have helped.", link:""},
+  {level:"2", week:6, title:"Passive Voice (all tenses)", cefr:"B1–B2", example:"The results will be announced next week.", link:""},
+  {level:"2", week:7, title:"Reported Speech: statements", cefr:"B1", example:"She said she was tired.", link:""},
+  {level:"2", week:8, title:"Reported questions & requests", cefr:"B1–B2", example:"He asked me where I lived. She told me to wait.", link:""},
+  {level:"2", week:9, title:"«Чтобы» по-английски: to / in order to / so that / want someone to", cefr:"B1–B2", example:"I came to help. Speak louder so that everyone can hear. I want you to know.", link:""},
+  {level:"2", week:10, title:"Relative clauses: defining & non-defining", cefr:"B1–B2", example:"My sister, who lives in Spain, is a doctor.", link:""},
+  {level:"2", week:11, title:"Complex Object: want / make / let / see someone do", cefr:"B1–B2", example:"I want you to stay. She made me laugh.", link:""},
+  {level:"2", week:12, title:"Gerund vs Infinitive: stop / remember / try", cefr:"B2", example:"I stopped to buy coffee. I stopped drinking coffee.", link:""},
+  {level:"2", week:13, title:"Used to / be used to / get used to", cefr:"B2", example:"I'm used to getting up early.", link:""},
+  {level:"3", week:1, title:"Mixed Conditionals", cefr:"B2–C1", example:"If I had taken that job, I'd be living in Paris now.", link:""},
+  {level:"3", week:2, title:"Wish / If only / I'd rather / It's time", cefr:"B2", example:"I wish I hadn't said that. It's time we went home.", link:""},
+  {level:"3", week:3, title:"Advanced Passive: It is said that… / He is believed to…", cefr:"B2–C1", example:"He is said to be the best chef in town.", link:""},
+  {level:"3", week:4, title:"Causative: have / get something done", cefr:"B2", example:"I had my hair cut yesterday.", link:""},
+  {level:"3", week:5, title:"Modals of deduction in all forms: must / might / can't + be / be doing / have done / have been doing", cefr:"B2", example:"She must be at home. He might be sleeping. They can't have left. She must have been working all night.", link:""},
+  {level:"3", week:6, title:"Past modals: should have / could have / needn't have", cefr:"B2", example:"You should have told me! You needn't have bought it.", link:""},
+  {level:"3", week:7, title:"Cleft sentences: What I love is… / It was… who", cefr:"C1", example:"What I love about this city is the food.", link:""},
+  {level:"3", week:8, title:"Participle clauses", cefr:"C1", example:"Feeling tired, I went to bed early.", link:""},
+  {level:"3", week:9, title:"Future in the past: was going to / was about to", cefr:"B2–C1", example:"I was about to call you when you texted.", link:""},
+  {level:"3", week:10, title:"Emphasis: do / did, so / such", cefr:"C1", example:"I do like your idea! It was such a good film.", link:""},
+  {level:"3", week:11, title:"Inversion for emphasis", cefr:"C1", example:"Never have I seen such a mess.", link:""},
+  {level:"3", week:12, title:"Advanced conditionals: unless / provided / as long as", cefr:"B2–C1", example:"Provided you're on time, we'll make it.", link:""},
+];
+
+/* Разговорный клуб — тексты для страницы (отредактируйте под себя) */
+const CLUB = {
+  name: "terrific.speaking",
+  tagline: "Разговорный клуб, где мы выводим говорение на новый уровень",
+  forWhom: [
+    "Понимаете английский, но «зависаете», когда нужно говорить",
+    "Хотите практику с живыми людьми, а не только видео",
+    "Готовы выйти на новый уровень вместе с группой",
+    "Хотите найти единомышленников и новых друзей, с которыми интересно расти вместе"
+  ],
+  intro: "TERRIFIC.SPEAKING — это проект, в котором мы выводим говорение на новый уровень",
+  inside: [
+    ["🎧","Живой английский, а не учебник","Занимаемся по реальным видео и аудио — на том английском, на котором говорят в жизни."],
+    ["🗣","Вы говорите почти всё занятие","Главный фокус — говорение и разговорная грамматика, которая нужна в живой речи."],
+    ["💬","Практика в парах","В Zoom по 2 человека в комнате — вы не ждёте своей очереди 10 минут, а говорите постоянно."],
+    ["👥","Маленькие группы до 8 человек","Каждого слышно, никто не теряется — и не страшно ошибаться."],
+    ["📝","Разбор ваших ошибок","После занятия вы получаете свои ошибки с исправлениями — и видите, над чем работать."],
+    ["🎯","Группа точно под ваш уровень","Бесплатное 10-минутное интервью с Анастасией — и вы попадаете туда, где комфортно и есть куда расти."]
+  ],
+  // Расписание. full:true — на кнопке будет «мест нет»
+  groups: [
+    {level:"B1+ / B2", day:"Понедельник", time:"20:00–21:30 МСК", teacher:"Ведёт лично Анастасия", full:true},
+    {level:"B1+ / B2", day:"Суббота",     time:"10:30–12:00 МСК", teacher:"Преподаватель команды TERRIFIC.ENGLISH", full:false},
+    {level:"B2+ / C1", day:"Вторник",     time:"19:00–20:30 МСК", teacher:"Ведёт лично Анастасия", full:false},
+  ],
+  steps: [
+    ["Бесплатное интервью с Анастасией — 10 минут", "Анастасия оценит ваш разговорный уровень и точно скажет, в какой группе вам будет комфортнее."],
+    ["Пробное занятие", "Если по результатам интервью вы попадаете в группу, оплачиваете первое пробное занятие."],
+    ["Решаете сами", "После пробного занятия решаете, хочется ли заниматься в группе дальше."]
+  ],
+  prices: [
+    ["Пробное занятие", "1 500 ₽"],
+    ["Абонемент на 4 занятия", "6 000 ₽"]
+  ]
+};
+
+/* ТЕСТ НА УРОВЕНЬ */
+const LEVEL_TEST = [
+  // A1
+  {lv:"A1", q:"Where ___ you from?", o:["are","is","do","does"], a:0},
+  {lv:"A1", q:"He ___ like fish.", o:["doesn't","don't","isn't","not"], a:0},
+  {lv:"A1", q:"I've got ___ umbrella in my bag.", o:["an","a","some","any"], a:0},
+  {lv:"A1", q:"___ there a bank near here?", o:["Is","Are","Do","Has"], a:0},
+  {lv:"A1", q:"My sister ___ two children.", o:["has","have","is","having"], a:0},
+  {lv:"A1", q:"The opposite of «expensive» is ___.", o:["cheap","poor","small","easy"], a:0},
+  // A2
+  {lv:"A2", q:"___ you ever been to London?", o:["Have","Did","Were","Has"], a:0},
+  {lv:"A2", q:"She ___ TV when I called her.", o:["was watching","watched","watches","has watched"], a:0},
+  {lv:"A2", q:"This is the ___ film I've ever seen.", o:["worst","worse","baddest","most bad"], a:0},
+  {lv:"A2", q:"You ___ smoke here. It's forbidden.", o:["mustn't","don't have to","needn't","haven't"], a:0},
+  {lv:"A2", q:"I'm looking forward ___ you.", o:["to seeing","to see","seeing","see"], a:0},
+  {lv:"A2", q:"How ___ money do you have?", o:["much","many","lot","few"], a:0},
+  {lv:"A2", q:"We're going to the beach ___ Saturday.", o:["on","in","at","by"], a:0},
+  {lv:"A2", q:"If it ___ tomorrow, we'll stay at home.", o:["rains","will rain","rained","would rain"], a:0},
+  {lv:"A2", q:"Can you ___ me a favour?", o:["do","make","give","take"], a:0},
+  {lv:"A2", q:"I'm really ___ in history — I read about it every day.", o:["interested","interesting","bored","boring"], a:0},
+  // B1
+  {lv:"B1", q:"I wish I ___ speak French.", o:["could","can","will","would"], a:0},
+  {lv:"B1", q:"He asked me where I ___.", o:["lived","live","am living","do live"], a:0},
+  {lv:"B1", q:"This house ___ in 1920.", o:["was built","built","has built","is building"], a:0},
+  {lv:"B1", q:"I've been waiting ___ two hours.", o:["for","since","during","from"], a:0},
+  {lv:"B1", q:"You'd better ___ a doctor.", o:["see","to see","seeing","seen"], a:0},
+  {lv:"B1", q:"She made me ___ the whole story again.", o:["tell","to tell","telling","told"], a:0},
+  {lv:"B1", q:"The man ___ car was stolen called the police.", o:["whose","who","which","whom"], a:0},
+  {lv:"B1", q:"I'm not used ___ in such a big city.", o:["to living","to live","living","live"], a:0},
+  {lv:"B1", q:"Can you ___ my cat while I'm on holiday?", o:["look after","look for","look up","look into"], a:0},
+  {lv:"B1", q:"If I had known, I ___ you.", o:["would have told","would tell","had told","will tell"], a:0},
+  {lv:"B1", q:"I can't ___ this phone — it's too expensive.", o:["afford","allow","pay","cost"], a:0},
+  {lv:"B1", q:"She ___ her bus and was late for work.", o:["missed","lost","failed","passed"], a:0},
+  {lv:"B1", q:"Our flight was ___ because of the storm.", o:["cancelled","stopped","finished","closed"], a:0},
+  {lv:"B1", q:"Could you ___ me some money until Friday?", o:["lend","borrow","owe","give back"], a:0},
+  {lv:"B1", q:"The ___ at the hotel was excellent.", o:["service","serving","servant","server"], a:0},
+  {lv:"B1", q:"He's so ___ — he never shares anything with anyone.", o:["mean","kind","generous","polite"], a:0},
+  {lv:"B1", q:"I need to ___ some weight before the summer.", o:["lose","miss","fail","drop out"], a:0},
+  {lv:"B1", q:"It took me ages to ___ used to my new job.", o:["get","do","make","stay"], a:0},
+  // B2
+  {lv:"B2", q:"By this time next year, I ___ my degree.", o:["will have finished","will finish","finish","am finishing"], a:0},
+  {lv:"B2", q:"He denied ___ the money.", o:["stealing","to steal","steal","to have stole"], a:0},
+  {lv:"B2", q:"It's high time we ___.", o:["left","leave","will leave","have left"], a:0},
+  {lv:"B2", q:"Not only ___ late, but he also forgot the tickets.", o:["was he","he was","he is","did he"], a:0},
+  {lv:"B2", q:"She ___ have left already — her coat is still here.", o:["can't","mustn't","needn't","shouldn't"], a:0},
+  {lv:"B2", q:"I'd rather you ___ tell anyone.", o:["didn't","don't","won't","not"], a:0},
+  {lv:"B2", q:"The meeting has been ___ until next week.", o:["put off","called off","taken off","turned off"], a:0},
+  {lv:"B2", q:"___ the bad weather, the match went ahead.", o:["Despite","Although","In spite","However"], a:0},
+  {lv:"B2", q:"She suggested ___ a taxi.", o:["taking","to take","take","took"], a:0},
+  {lv:"B2", q:"He's ___ to win the election.", o:["likely","probable","possible","able"], a:0},
+  {lv:"B2", q:"You need to ___ more of an effort.", o:["make","do","take","give"], a:0},
+  {lv:"B2", q:"Smoking is ___ in all public buildings.", o:["prohibited","prevented","refused","denied"], a:0},
+  {lv:"B2", q:"The film was so ___ that I fell asleep.", o:["dull","dim","blunt","faint"], a:0},
+  {lv:"B2", q:"We had to ___ the party because Tom was ill.", o:["call off","call up","call back","call in"], a:0},
+  {lv:"B2", q:"The company is ___ a new product next month.", o:["launching","opening","throwing","starting up"], a:0},
+  {lv:"B2", q:"Prices have ___ sharply this year.", o:["risen","raised","arisen","lifted"], a:0},
+  {lv:"B2", q:"She's a ___ reader — she finishes a book a week.", o:["keen","sharp","hot","deep"], a:0},
+  {lv:"B2", q:"We should ___ advantage of the good weather.", o:["take","make","have","get"], a:0},
+  {lv:"B2", q:"His theory is ___ by strong evidence.", o:["backed up","backed off","backed down","backed out"], a:0},
+  // C1
+  {lv:"C1", q:"He was on the ___ of tears.", o:["verge","edge","border","rim"], a:0},
+  {lv:"C1", q:"The new policy has ___ a lot of controversy.", o:["given rise to","come across","brought up","put up with"], a:0},
+  {lv:"C1", q:"Should you ___ any problems, call me.", o:["have","had","having","to have"], a:0},
+  {lv:"C1", q:"It was a ___ decision, made without much thought.", o:["snap","crack","flash","pop"], a:0},
+  {lv:"C1", q:"She takes ___ her mother — they're so alike.", o:["after","over","up","on"], a:0},
+  {lv:"C1", q:"The results were ___ with our expectations.", o:["in line","on line","at line","by line"], a:0},
+  {lv:"C1", q:"He ___ to have been a brilliant student.", o:["is said","says","is saying","said"], a:0},
+  {lv:"C1", q:"We need to ___ the pros and cons.", o:["weigh up","balance out","measure up","count up"], a:0},
+  {lv:"C1", q:"Her opinion carries a lot of ___ in the company.", o:["weight","mass","power","load"], a:0},
+  {lv:"C1", q:"The CEO ___ full responsibility for the mistake.", o:["took","made","gave","did"], a:0},
+  {lv:"C1", q:"The exam results were a ___ disappointment.", o:["bitter","sour","salty","acid"], a:0},
+  // C2
+  {lv:"C2", q:"His argument doesn't hold ___.", o:["water","air","ground","weight"], a:0},
+  {lv:"C2", q:"She was ___ by the news — she hadn't expected it at all.", o:["taken aback","taken in","taken over","taken up"], a:0},
+  {lv:"C2", q:"Were it not ___ your help, I would have failed.", o:["for","by","with","from"], a:0},
+  {lv:"C2", q:"The future of the project is still very much ___ the air.", o:["up in","on","at","over"], a:0},
+  {lv:"C2", q:"He's always been one to ___ the line and never break the rules.", o:["toe","foot","heel","hand"], a:0},
+  {lv:"C2", q:"He has a ___ for exaggeration.", o:["penchant","pension","pendant","penance"], a:0},
+];
+const DONT_KNOW = "Не знаю";
+const TEST_RESULTS = [
+  {max:8,  level:"A1", title:"Beginner",           track:"1", text:"Вы в начале пути. Начните с материалов A2+ – B1: смотрите видео и пересматривайте — прогресс придёт быстро."},
+  {max:18, level:"A2", title:"Elementary",         track:"1", text:"Хорошая база! Ваши материалы — A2+ – B1: они помогут заговорить увереннее."},
+  {max:35, level:"B1", title:"Intermediate",       track:"2", text:"Вы уже общаетесь на бытовые темы. Материалы B1+ – B2 помогут говорить свободно и без ошибок."},
+  {max:53, level:"B2", title:"Upper-Intermediate", track:"3", text:"Отличный уровень! Материалы B2+ – C1 добавят идиомы и естественность речи."},
+  {max:64, level:"C1", title:"Advanced",           track:"3", text:"Впечатляет! Материалы B2+ – C1 и разговорный клуб — то, что отшлифует ваш английский."},
+  {max:70, level:"C2", title:"Proficiency",        track:"3", text:"Это уровень носителя! Вам точно будет интересно в разговорном клубе — приходите обсуждать сложные темы."},
+];
+
+/* КАРТОЧКИ — слова недели по уровням. [[...]] в примере — то, что скрыто пропуском. */
+let WEEKS = [{"n": 1, "levels": {"1": {"title": "Trainer for cyclists", "p1": 17, "words": [["find out about", "узнавать о", "I'm [[finding out about]] being a personal trainer."], ["be injured", "получить травму", "I [[was injured]] many years ago."], ["an injury", "травма", "The reason for [[the injury]] was simple."], ["cycling", "велоспорт, езда на велосипеде", "I had to stop a hobby that I loved – [[cycling]]."], ["no longer", "больше не", "I could [[no longer]] go in for competitions."], ["go in for competitions", "участвовать в соревнованиях", "I could no longer [[go in for competitions]]."], ["lead to", "привести к", "How did this [[lead to]] you becoming a trainer?"], ["the reason for", "причина (чего-то)", "[[The reason for]] the injury was…"], ["train properly", "тренироваться правильно", "I hadn't [[trained properly]] for events."], ["push yourself too hard", "перенапрягаться", "I [[pushed myself too hard]]."], ["injure your ankle badly", "сильно травмировать лодыжку", "I finally [[injured my ankle]] very badly."], ["do a sport", "заниматься спортом", "It was a lesson in how not to [[do a sport]]."], ["compete", "соревноваться", "I wanted to help people train and [[compete]] safely."], ["not at all", "вовсе нет, совсем нет", "Do you only train cyclists? — No, [[not at all]]."], ["in order to", "для того чтобы", "I decided to support anyone [[in order to]] get enough work."], ["make a choice", "сделать выбор", "I [[made the choice]] to support anyone."], ["support", "поддерживать, помогать", "I would try to [[support]] anyone."], ["quite a lot of", "довольно много", "I help [[quite a lot of]] runners."], ["get fit", "прийти в форму", "People who just want to [[get fit]]."], ["hold sessions", "проводить занятия", "Where do you [[hold your sessions]]?"], ["it depends on", "это зависит от", "[[It depends on]] the weather."], ["dry", "сухой (о погоде)", "When it's [[dry]] and not too hot…"], ["simply", "просто", "I [[simply]] meet them in the park."], ["push yourself for longer", "выкладываться дольше", "People are able to [[push themselves for longer]]."], ["embarrassed", "смущённый; feel embarrassed — стесняться", "Some customers feel [[embarrassed]]."], ["in public", "на людях, при всех", "Doing exercises [[in public]]."], ["it sounds like fun", "звучит весело", "[[It sounds like]] a lot of fun!"], ["definitely", "определённо, конечно", "Are you busy? — [[Definitely]]."], ["be concerned about", "беспокоиться о", "People have become more [[concerned about]] their health."], ["a growing interest in", "растущий интерес к", "There's [[a growing interest in]] keeping fit."], ["keep fit", "поддерживать форму", "There's a growing interest in [[keeping fit]]."], ["get into shape", "привести себя в форму", "Customers who want to [[get into shape]] for the beach."]]}, "2": {"title": "Hobby horsing", "p1": 20, "words": [["know full well", "прекрасно понимать", "Nara [[knows full well]] how odd it must look."], ["odd", "странный", "How [[odd]] it must look to some."], ["be mocked", "подвергаться насмешкам", "I remember [[being mocked]]."], ["the sky is the limit", "нет предела (возможностям)", "I feel like only [[the sky is the limit]]."], ["literally", "буквально", "There's [[literally]] nothing that I haven't heard."], ["keep going", "продолжать, не сдаваться", "That's the one thing that makes me want to [[keep going]]."], ["no boundaries", "никаких границ", "I feel like there are [[no boundaries]]."], ["various disciplines", "различные дисциплины", "And even [[various disciplines]], such as show jumping and dressage."], ["a championship", "чемпионат", "The Hobby Horse [[Championship]] is held in Finland."], ["held annually", "проводится ежегодно", "The championship is [[held annually]] in Finland."], ["attract", "привлекать", "It [[attracts]] some 300 participants."], ["give someone the opportunity to", "давать (кому-то) возможность", "It [[gives me the opportunity to]] be creative."], ["bring someone a lot of joy", "приносить (кому-то) много радости", "It [[brings me a lot of joy]]."], ["a steed", "скакун, конь", "When real [[steeds]] aren't available, she rides a hobby horse."], ["win numerous awards", "выиграть множество наград", "She's [[won numerous awards]]."], ["compete in", "участвовать (в соревновании)", "This is her ninth time [[competing in]] the championship."], ["at first glance", "на первый взгляд", "[[At first glance]], they may look alike."], ["look alike", "выглядеть одинаково", "They may [[look alike]], but there are differences."], ["a pole", "жердь (барьер)", "This stick doesn't take [[the pole]] off when I jump."], ["the path to recognition", "путь к признанию", "[[The path to recognition]] as a sport began in 2002."], ["founding", "основание (организации)", "The [[founding]] of the first Hobby Horse Association."], ["have a following", "иметь поклонников", "At first, it didn't [[have much of a following]]."], ["gain in popularity", "набирать популярность", "The sport is [[gaining in popularity]]."], ["spread", "распространять", "Nara has been [[spreading]] her enthusiasm on Instagram."], ["along with", "наряду с", "[[Along with]] official rules for competitions."], ["a parking lot", "парковка", "The first one was a really small competition in [[a parking lot]]."], ["a role model", "пример для подражания", "Finland is a really good [[role model]]."], ["knock a pole", "сбить жердь", "Jump high, don't [[knock any poles]]."], ["let go of the reins", "отпустить поводья", "And don't [[let go of the reins]]."], ["come second", "занять второе место", "Last time, in 2018, I [[came second]]."], ["go for broke", "идти ва-банк", "Time to [[go for broke]]."], ["evaluate", "оценивать", "The jury [[evaluates]] poise."], ["poise", "уверенность, грация", "Along with technique and speed, the jury evaluates [[poise]]."], ["end up in fifth place", "в итоге оказаться на пятом месте", "Unfortunately, she [[ends up in fifth place]]."], ["give up a dream", "отказаться от мечты", "She's not ready to [[give up her dream]]."], ["succeed", "добиться успеха", "I will [[succeed]] sometime."], ["genuine", "настоящий, подлинный", "Hobby horsing is a [[genuine]] sport."], ["make-believe", "игра, выдумка, понарошку", "Far more than just [[make-believe]] for little kids."]]}, "3": {"title": "Benefits of exercise", "p1": 17, "words": [["have benefits for", "приносить пользу (кому-то)", "Regular exercise [[has benefits for]] everyone."], ["throughout the week", "в течение недели", "[[Throughout the week]], aim to do 150 minutes of activity."], ["aim to do", "стараться, ставить цель сделать", "[[Aim to]] be physically active every day."], ["moderate activity", "умеренная нагрузка", "150 minutes of [[moderate activity]]."], ["a brisk walk", "быстрая прогулка, ходьба бодрым шагом", "This could be [[a brisk walk]] or cycling."], ["vigorous activity", "интенсивная нагрузка", "75 minutes of [[vigorous activity]], such as running."], ["a bout of", "короткий подход, отрезок (активности)", "You can do even shorter [[bouts of]] very vigorous activity."], ["the more…, the better", "чем больше…, тем лучше", "[[The more]] you do, [[the better]]."], ["reduce your risk of", "снизить риск (чего-то)", "Exercise is great for the heart, [[reducing your risk of]] a stroke."], ["a stroke", "инсульт", "Exercise reduces your risk of [[a stroke]]."], ["cut your chance of… by a third", "снизить вероятность… на треть", "It [[cuts your chance of]] cardiovascular disease [[by a third]]."], ["cardiovascular disease", "сердечно-сосудистые заболевания", "Your chance of [[cardiovascular disease]]."], ["up your pace", "ускорить темп", "Why not [[up your walking pace]]?"], ["out and about", "вне дома, в делах", "When you're [[out and about]]."], ["joints", "суставы", "Keeps your muscles, bones and [[joints]] strong."], ["prevent falls and fractures", "предотвращать падения и переломы", "It also helps [[prevent falls and fractures]]."], ["strengthen your muscles", "укреплять мышцы", "Try doing exercises that [[strengthen your muscles]]."], ["burn calories", "сжигать калории", "Exercise [[burns calories]]."], ["maintain a healthy weight", "поддерживать здоровый вес", "And helps to [[maintain a healthy weight]]."], ["in turn", "в свою очередь", "Which [[in turn]] reduces your risk of many health problems."], ["a healthy balanced diet", "здоровое сбалансированное питание", "Maintain [[a healthy balanced diet]] alongside exercise."], ["cut your risk of", "снизить риск (чего-то)", "You can [[cut your risk of]] some cancers by around a quarter."], ["be likely to", "скорее всего (сделать что-то)", "They'll [[be more likely to]] continue being active."], ["your chances of", "вероятность (чего-то)", "A healthy weight reduces [[your chances of]] diabetes."], ["diabetes", "диабет", "Around 3.5 million people in the UK have [[diabetes]]."], ["it's estimated that", "по оценкам", "[[It's estimated that]] around 3.5 million people have it."], ["lower blood glucose levels", "снижать уровень сахара в крови", "Exercise helps manage diabetes by [[lowering blood glucose levels]]."], ["it's thought that", "считается, что", "[[It's thought that]] it can reduce your risk of depression."], ["develop depression", "заболеть депрессией", "It can reduce your risk of [[developing depression]] and dementia."], ["relieve stress", "снимать стресс", "Exercise can help [[relieve stress]] and anxiety."], ["the great outdoors", "природа, свежий воздух", "Use [[the great outdoors]]."], ["it's a hit for", "это отлично для", "[[It's a hit for]] your physical and mental health."], ["there's no catch", "здесь нет подвоха", "[[There's no catch]]."], ["reap the benefits", "пожинать плоды, получать пользу", "Start [[reaping the benefits]] of exercise today."]]}}}];
+
+const LOGO = "data:image/webp;base64,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";
+
+/* ================================================================= */
+
+const tg = window.Telegram && window.Telegram.WebApp;
+const inTelegram = !!(tg && tg.platform && tg.platform !== "unknown");
+if (tg) { tg.ready(); tg.expand(); }
+const haptic = t => { try{ if(!tg||!tg.HapticFeedback) return; t ? tg.HapticFeedback.notificationOccurred(t) : tg.HapticFeedback.impactOccurred("light"); }catch(e){} };
+
+const store = {
+  get(){ try{ return JSON.parse(localStorage.getItem("te_progress")||"{}"); }catch(e){ return {}; } },
+  set(k,v){ try{ const s=this.get(); s[k]=v; localStorage.setItem("te_progress",JSON.stringify(s)); }catch(e){} }
+};
+
+function openLink(url){
+  if(!url || url==="https://t.me/") { try{ tg && tg.showAlert ? tg.showAlert("Ссылка скоро появится 🙂") : alert("Ссылка скоро появится 🙂"); }catch(e){} return; }
+  haptic();
+  try{
+    if(inTelegram && /^https:\/\/t\.me\//.test(url)) { tg.openTelegramLink(url); return; }
+    if(inTelegram) { tg.openLink(url); return; }
+  }catch(e){}
+  window.open(url, "_blank");
+}
+
+const app = document.getElementById("app");
+const stack = [];
+function go(view){ haptic(); stack.push(view); render(); window.scrollTo(0,0); }
+function back(){ stack.pop(); if(!stack.length) stack.push({name:"home"}); render(); window.scrollTo(0,0); }
+function home(){ stack.length=0; stack.push({name:"home"}); render(); window.scrollTo(0,0); }
+const cur = () => stack[stack.length-1];
+if (tg && tg.BackButton) tg.BackButton.onClick(back);
+const esc = s => String(s==null?"":s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const backBtn = () => inTelegram ? "" : `<button class="back" onclick="back()">← Назад</button>`;
+const lvl = id => LEVELS.find(l=>l.id===id);
+const fmtDate = d => { const m=["янв","фев","мар","апр","мая","июн","июл","авг","сен","окт","ноя","дек"]; const p=String(d).split("-"); return p.length===3 ? (+p[2])+" "+m[+p[1]-1] : ""; };
+
+function render(){
+  if(tg && tg.BackButton) stack.length>1 ? tg.BackButton.show() : tg.BackButton.hide();
+  const v = cur();
+  ({home:renderHome, cardsLv:renderCardsLv, cardsMode:renderCardsMode, deck:renderDeck, progress:renderProgress, levels:renderLevels, hub:renderHub, grammar:renderGrammar, topics:renderTopics, list:renderList, fresh:renderFresh, mat:renderMat,
+    club:renderClub, quiz:renderQuiz})[v.name](v);
+}
+
+function renderHome(){
+  const p = store.get();
+  const name = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.first_name : "";
+  const freshCount = MATERIALS.filter(m=>isFresh(m.date)).length;
+  app.innerHTML = `
+    <div class="hero center">
+      <img class="logo" src="${LOGO}" alt="terrific.speaking">
+      <small>${esc(CONFIG.author)}</small>
+      <h1>${name ? "Hi, "+esc(name)+"! 👋" : "Welcome! 👋"}</h1>
+      <p>Новые материалы каждый день — для трёх уровней.</p>
+      ${p.level ? `<span class="badge">Ваш уровень: ${esc(p.level)} · материалы ${esc(lvl(p.track).name)}</span>` : ""}
+    </div>
+    <div class="grid">
+      <div class="tile" onclick="startTest()">
+        <div class="ico" style="background:#fff1d6">🎯</div>
+        <div><h3>Тест на уровень</h3><p>${p.level?`Ваш уровень: ${esc(p.level)} · нажмите, чтобы пройти заново`:"70 вопросов · грамматика и лексика · ~25 минут"}</p></div><span class="arrow">›</span>
+      </div>
+      <div class="tile" onclick="go({name:'fresh'})">
+        <div class="ico" style="background:#e3f0fd">🆕</div>
+        <div><h3>Новое за неделю</h3><p>Видео, карточки и рабочая тетрадь вашего уровня</p></div><span class="arrow">›</span>
+      </div>
+      <div class="tile" onclick="go({name:'levels'})">
+        <div class="ico" style="background:#fdeee3">📚</div>
+        <div><h3>Материалы</h3><p>Все недели по темам и уровням + грамматика</p></div><span class="arrow">›</span>
+      </div>
+      <div class="tile" onclick="go({name:'cardsLv'})">
+        <div class="ico" style="background:#fde3f1">🃏</div>
+        <div><h3>Учить слова</h3><p>Карточки со словами недели</p></div><span class="arrow">›</span>
+      </div>
+      <div class="tile" onclick="go({name:'progress'})">
+        <div class="ico" style="background:#e8f5ee">📈</div>
+        <div><h3>Мой прогресс</h3><p>${progressLine()}</p></div><span class="arrow">›</span>
+      </div>
+      <div class="tile big" onclick="go({name:'club'})">
+        <div class="ico" style="background:rgba(255,255,255,.15)">🎙️</div>
+        <div><h3>Разговорный клуб ${esc(CLUB.name)}</h3><p>Узнать больше и записаться</p></div><span class="arrow">›</span>
+      </div>
+      <div class="tile" onclick="openLink(CONFIG.askLink)">
+        <div class="ico" style="background:#e8f5ee">✉️</div>
+        <div><h3>Задать вопрос</h3><p>Напишите нам: @terrificenglish</p></div><span class="arrow">›</span>
+      </div>
+    </div>
+    <footer>Made with ❤️ by ${esc(CONFIG.author)} · версия 31.10</footer>`;
+}
+
+function renderLevels(){
+  const p = store.get();
+  app.innerHTML = `${backBtn()}
+    <h2 style="margin-top:0">📚 Материалы</h2>
+    <p class="muted" style="margin-top:-4px">Выберите свой уровень${p.track?"":" — не знаете какой? Пройдите тест 🎯"}</p>
+    <div class="grid">
+      ${LEVELS.map(l=>{
+        const n = MATERIALS.filter(m=>m.level===l.id).length;
+        return `<div class="tile" onclick="go({name:'topics',level:'${l.id}'})">
+          <div class="lvl" style="background:${l.color};color:${l.fg}">${l.name.replace(" – ","–")}</div>
+          <div><h3>${esc(l.name)} ${p.track===l.id?'<span class="tag" style="background:var(--accent);color:#fff">ваш</span>':""}</h3>
+          <p>${esc(l.desc)}${n?` · ${n} материалов`:""}</p></div><span class="arrow">›</span></div>`;}).join("")}
+    </div>
+    <h2>Для всех уровней</h2>
+    <div class="grid">
+      <div class="tile" onclick="go({name:'grammar'})">
+        <div class="ico" style="background:#fde3f1">🧩</div>
+        <div><h3>Грамматика</h3><p>${GRAMMAR.length} тем · от A1 до C1 — для каждой указано, для кого</p></div><span class="arrow">›</span></div>
+    </div>
+    ${p.track?"":`<button class="btn ghost" onclick="startTest()">Пройти тест на уровень</button>`}`;
+}
+
+function renderHub(v){
+  const L = lvl(v.level);
+  const nv = MATERIALS.filter(m=>m.level===v.level).length, ng = GRAMMAR.filter(g=>g.level===v.level).length;
+  app.innerHTML = `${backBtn()}
+    <span class="tag" style="background:${L.color};color:${L.fg}">${esc(L.name)}</span>
+    <h2 style="margin-top:8px">${esc(L.desc)}</h2>
+    <div class="grid">
+      <div class="tile" onclick="go({name:'topics',level:'${v.level}'})">
+        <div class="ico" style="background:${L.color}">🎬</div>
+        <div><h3>Видео по темам</h3><p>${nv} материалов</p></div><span class="arrow">›</span></div>
+      <div class="tile" onclick="go({name:'grammar',level:'${v.level}'})">
+        <div class="ico" style="background:${L.color}">🧩</div>
+        <div><h3>Грамматика</h3><p>Программа на ${ng} недель</p></div><span class="arrow">›</span></div>
+    </div>`;
+}
+function renderGrammar(){
+  const groups = [["A1–A2",c=>c.startsWith("A")],["B1",c=>c.startsWith("B1")],["B2",c=>c.startsWith("B2")],["C1",c=>c.startsWith("C1")]];
+  app.innerHTML = `${backBtn()}
+    <h2 style="margin-top:0">🧩 Грамматика</h2>
+    <p class="muted" style="margin-top:-4px">Выбирайте любые темы — у каждой указано, для какого уровня она</p>
+    ${groups.map(([name,test])=>{
+      const list = GRAMMAR.filter(g=>test(g.cefr));
+      if(!list.length) return "";
+      return `<h2>${name}</h2><div class="card" style="padding:4px 16px">${list.map(g=>`
+        <div class="item ${g.link?"":"soon"}" onclick="${g.link?`openLink(GRAMMAR[${GRAMMAR.indexOf(g)}].link)`:""}">
+          <div class="play" style="font-weight:800;font-size:11px;width:44px;border-radius:12px">${esc(g.cefr)}</div>
+          <div><b>${esc(g.title)}</b><small style="font-style:italic">${esc(g.example)}</small><br><small>Для: ${esc(g.cefr)} · ${g.link?"открыть урок":"скоро"}</small></div></div>`).join("")}</div>`;
+    }).join("")}`;
+}
+
+function renderTopics(v){
+  const L = lvl(v.level);
+  const topics = [...new Set(MATERIALS.filter(m=>m.level===v.level).map(m=>m.topic))];
+  app.innerHTML = `${backBtn()}
+    <span class="tag" style="background:${L.color};color:${L.fg}">${esc(L.name)}</span>
+    <h2 style="margin-top:8px">🎬 Видео по темам</h2>
+    <div class="grid">
+      ${topics.length ? topics.map(t=>{
+        const n = MATERIALS.filter(m=>m.level===v.level && m.topic===t).length;
+        return `<div class="tile" onclick='go({name:"list",level:"${v.level}",topic:${JSON.stringify(t).replace(/'/g,"&#39;")}})'>
+          <div class="ico" style="background:${L.color}">${TOPIC_ICONS[t]||"📌"}</div>
+          <div><h3>${esc(t)}</h3><p>${n} ${n===1?"материал":n<5?"материала":"материалов"}</p></div><span class="arrow">›</span></div>`;}).join("")
+      : `<div class="card muted">Материалы для этого уровня скоро появятся ✨</div>`}
+    </div>`;
+}
+
+function itemsHtml(list, showLevel){
+  const sorted = [...list].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+  const idx = m => MATERIALS.indexOf(m);
+  return `<div class="card" style="padding:4px 16px">${sorted.map(m=>`
+    <div class="item" onclick="go({name:'mat',i:${idx(m)}})">
+      <div class="play">▶</div>
+      <div><b>${esc(m.title)}</b>
+      <small>${showLevel?esc(lvl(m.level).name)+" · "+esc(m.topic)+" · ":""}${m.date?"неделя с "+fmtDate(m.date)+" · ":""}видео, карточки, тетрадь</small></div>
+    </div>`).join("")}</div>`;
+}
+
+function renderList(v){
+  const L = lvl(v.level);
+  const list = MATERIALS.filter(m=>m.level===v.level && m.topic===v.topic).sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+  app.innerHTML = `${backBtn()}
+    <h2 style="margin-top:0">${TOPIC_ICONS[v.topic]||"📌"} ${esc(v.topic)}</h2>
+    ${list.length ? list.map(weekBlock).join("") : `<div class="card muted">Материалы скоро появятся ✨</div>`}`;
+}
+
+function isFresh(d){ const t=Date.parse(d); return !isNaN(t) && (Date.now()-t) < 7*864e5 && t <= Date.now()+864e5; }
+function addDays(d,n){ const t=new Date(d+"T12:00:00"); t.setDate(t.getDate()+n); return t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0"); }
+const WD=["вс","пн","вт","ср","чт","пт","сб"];
+function weekBlock(m){
+  const L=lvl(m.level), mi=MATERIALS.indexOf(m), key=s=>String(s).trim().toLowerCase();
+  const parts = PART_NAMES.map((nm,i)=>{
+    const r = PARTS.find(x=>x.level===m.level && key(x.title)===key(m.title) && x.part===i+1);
+    const d = (r&&r.date) || (m.date ? addDays(m.date,i) : "");
+    const wd = d ? WD[new Date(d+"T12:00:00").getDay()]+", "+fmtDate(d) : "";
+    const link = r && r.link;
+    return `<div class="item ${link?"":"soon"}" onclick="${link?`openLink(PARTS[${PARTS.indexOf(r)}].link)`:"partSoon()"}">
+      <div class="play" style="background:${L.color};color:${L.fg};font-size:16px">${PART_ICONS[i]}</div>
+      <div><b>Part ${i+1} · ${esc(nm)}</b><small>${wd}${wd?" · ":""}${link?"открыть задание":"откроется "+(d?fmtDate(d):"позже")}</small></div></div>`;}).join("");
+  const hasCards = CUR && CUR.levels[m.level];
+  return `<div class="card" style="padding:14px 16px">
+      <span class="tag" style="background:${L.color};color:${L.fg}">${esc(L.name)}</span>
+      <h3 style="margin:8px 0 2px">${TOPIC_ICONS[m.topic]||"📌"} ${esc(m.title)}</h3>
+      <p class="muted" style="margin:0 0 6px;font-size:13px">${esc(m.topic)}${m.date?" · неделя с "+fmtDate(m.date):""}</p>
+      <div class="item ${m.link?"":"soon"}" onclick="${m.link?`openLink(MATERIALS[${mi}].link)`:""}"><div class="play">▶</div><div><b>Видео недели</b><small>${m.link?"смотреть":"скоро"}</small></div></div>
+      ${hasCards?`<div class="item" onclick="go({name:'cardsMode',level:'${m.level}'})"><div class="play" style="background:#fde3f1;color:var(--accent);font-size:16px">🃏</div><div><b>Карточки: слова недели</b><small>перейти в «Учить слова»</small></div></div>`:""}
+      <p style="margin:12px 0 0;font-weight:800;font-size:14px">📒 Рабочая тетрадь</p>
+      ${parts}
+    </div>`;
+}
+function partSoon(){ try{ tg && tg.showAlert ? tg.showAlert("Эта часть ещё не вышла — она появится в группе в 13:00 в свой день 🙂") : alert("Эта часть ещё не вышла 🙂"); }catch(e){} }
+function renderFresh(v){
+  const p = store.get();
+  const lv = v.lv || p.track || "1";
+  let list = MATERIALS.filter(m=>m.level===lv && isFresh(m.date));
+  if(!list.length) list = MATERIALS.filter(m=>m.level===lv).sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,1);
+  app.innerHTML = `${backBtn()}
+    <h2 style="margin-top:0">🆕 Новое за неделю</h2>
+    <div class="seg">${LEVELS.map(L=>`<button class="${L.id===lv?"on":""}" onclick="cur().lv='${L.id}';render()">${L.name.replace(" – ","–")}${p.track===L.id?" ★":""}</button>`).join("")}</div>
+    ${list.length ? list.map(weekBlock).join("") : `<div class="card muted">Материалы для этого уровня скоро появятся ✨</div>`}`;
+}
+function renderMat(v){ const m=MATERIALS[v.i]; app.innerHTML = `${backBtn()}${m?weekBlock(m):""}`; }
+
+function renderClub(){
+  app.innerHTML = `${backBtn()}
+    <div class="hero center">
+      <img class="logo" src="${LOGO}" alt="terrific.speaking" style="width:190px">
+      <p style="font-size:15px;font-weight:700">${esc(CLUB.tagline)}</p>
+    </div>
+    <div class="card"><b>Для кого</b><ul class="list">${CLUB.forWhom.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>
+    <div class="card"><b>Что внутри</b>
+      ${CLUB.inside.map(x=>`<div class="step"><div class="n" style="background:rgba(253,23,150,.12);font-size:15px">${x[0]}</div><div><b>${esc(x[1])}</b><p>${esc(x[2])}</p></div></div>`).join("")}
+    </div>
+    <div class="card"><b>🗓 Расписание</b>
+      ${CLUB.groups.map(g=>`<div class="grp"><div>
+        <span class="tag">${esc(g.level)}</span><b style="margin-top:6px">${esc(g.day)}, ${esc(g.time)}</b>
+        <small>${esc(g.teacher)}</small></div>
+        <span class="pill ${g.full?"full":""}">${g.full?"мест нет":"есть места"}</span></div>`).join("")}
+    </div>
+    <div class="card"><b>Как попасть в группу</b>
+      ${CLUB.steps.map((st,i)=>`<div class="step"><div class="n">${i+1}</div><div><b>${esc(st[0])}</b><p>${esc(st[1])}</p></div></div>`).join("")}
+    </div>
+    <div class="card"><b>💳 Стоимость</b>
+      ${CLUB.prices.map(p=>`<div class="price"><span>${esc(p[0])}</span><b>${esc(p[1])}</b></div>`).join("")}
+    </div>
+    <button class="btn dark" onclick="openLink(CONFIG.clubSignupLink)">Записаться на бесплатное интервью</button>
+    <button class="btn ghost" onclick="openLink(CONFIG.askLink)">Задать вопрос о клубе</button>`;
+}
+
+
+/* ---------- Карточки и прогресс ---------- */
+let CUR = WEEKS[WEEKS.length-1];
+const ckey = (w,l) => "k_"+w+"_"+l;
+function known(w,l){ return store.get()[ckey(w,l)]||[]; }
+function today(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function markActive(){ const days=store.get().days||[]; const t=today(); if(!days.includes(t)){ days.push(t); store.set("days",days.slice(-400)); } }
+function streak(){
+  const days=new Set(store.get().days||[]); let n=0; const d=new Date();
+  if(!days.has(today())) d.setDate(d.getDate()-1);
+  while(true){ const k=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); if(days.has(k)){n++; d.setDate(d.getDate()-1);} else break; }
+  return n;
+}
+function totalKnown(){ let n=0; WEEKS.forEach(w=>Object.keys(w.levels).forEach(l=>n+=known(w.n,l).length)); return n; }
+function weeksDone(){ let n=0; WEEKS.forEach(w=>Object.entries(w.levels).forEach(([l,x])=>{ if(known(w.n,l).length>=x.words.length) n++; })); return n; }
+function progressLine(){ const s=streak(); return (s?`🔥 ${s} ${s===1?"день":s<5?"дня":"дней"} подряд · `:"")+`выучено слов: ${totalKnown()}`; }
+const gapHtml = e => esc(e).replace(/\[\[(.*?)\]\]/g,(m,x)=>`<span class="gap" data-a="${x}" onclick="event.stopPropagation();this.textContent=this.dataset.a">______</span>`);
+function say(t){ try{ const u=new SpeechSynthesisUtterance(t.replace("…","")); u.lang="en-GB"; u.rate=.9; speechSynthesis.cancel(); speechSynthesis.speak(u);}catch(e){} }
+
+function renderCardsLv(){
+  const p=store.get();
+  app.innerHTML = `${backBtn()}
+    <h2 style="margin-top:0">🃏 Учить слова</h2>
+    <p class="muted" style="margin-top:-4px">Неделя ${CUR.n} · выберите свой уровень</p>
+    <div class="grid">${LEVELS.map(l=>{ const x=CUR.levels[l.id]; if(!x) return ""; const k=known(CUR.n,l.id).length;
+      return `<div class="tile" onclick="go({name:'cardsMode',level:'${l.id}'})">
+        <div class="lvl" style="background:${l.color};color:${l.fg}">${l.name.replace(" – ","–")}</div>
+        <div><h3>${esc(x.title)} ${p.track===l.id?'<span class="tag" style="background:var(--accent);color:#fff">ваш</span>':""}</h3><p>Выучено ${k} из ${x.words.length}</p>
+        <div class="progress" style="margin:6px 0 0"><i style="width:${Math.round(k/x.words.length*100)}%"></i></div></div><span class="arrow">›</span></div>`;}).join("")}</div>`;
+}
+let cardDir = "ru";
+function renderCardsMode(v){
+  const L=lvl(v.level), x=CUR.levels[v.level], kn=known(CUR.n,v.level);
+  const p1=x.words.slice(0,x.p1), p2=x.words.slice(x.p1);
+  const cnt=a=>a.filter(w=>!kn.includes(w[0])).length;
+  app.innerHTML = `${backBtn()}
+    <span class="tag" style="background:${L.color};color:${L.fg}">${esc(L.name)}</span>
+    <h2 style="margin-top:8px">${esc(x.title)}</h2>
+    <div class="seg"><button class="${cardDir==="ru"?"on":""}" onclick="cardDir='ru';render()">RU → EN</button><button class="${cardDir==="en"?"on":""}" onclick="cardDir='en';render()">EN → RU</button></div>
+    <div class="grid">
+      ${[["Часть 1",0,x.p1,"с Part 1"],["Часть 2",x.p1,x.words.length,"с Part 4"],["Все слова недели",0,x.words.length,"повторение"]].map(([n,a,b,h])=>{
+        const left=cnt(x.words.slice(a,b));
+        return `<div class="tile" onclick="startDeck('${v.level}',${a},${b})"><div><h3>${n}</h3><p>${b-a} слов · ${h} · ${left?`осталось выучить: ${left}`:"✓ всё выучено"}</p></div><span class="arrow">›</span></div>`;}).join("")}
+    </div>
+    ${kn.length?`<button class="btn ghost" onclick="resetLevel('${v.level}')">Начать заново</button>`:""}`;
+}
+function resetLevel(l){ store.set(ckey(CUR.n,l),[]); render(); }
+function startDeck(l,a,b){
+  const x=CUR.levels[l], kn=known(CUR.n,l);
+  let q=x.words.slice(a,b).filter(w=>!kn.includes(w[0]));
+  if(!q.length) q=x.words.slice(a,b);   // всё выучено — повторяем всё
+  q=q.map(w=>w).sort(()=>Math.random()-.5);
+  go({name:"deck",level:l,q,total:q.length,done:0,flip:false});
+}
+function renderDeck(v){
+  if(!v.q.length){
+    app.innerHTML = `<div class="card result"><div style="font-size:52px">🎉</div><h3>Отлично!</h3><p class="muted">Вы прошли все карточки</p></div>
+      <button class="btn" onclick="back()">К выбору частей</button><button class="back" style="display:block;margin:16px auto 0" onclick="home()">В главное меню</button>`;
+    return;
+  }
+  const [w,t,e]=v.q[0];
+  const sayBtn = `<button class="say" onclick="event.stopPropagation();say(${JSON.stringify(w).replace(/"/g,"&quot;")})">🔊 Послушать</button>`;
+  const filled = esc(e).replace(/\[\[(.*?)\]\]/g,(m,x)=>`<b style="color:var(--accent)">${x}</b>`);
+  const blank = esc(e).replace(/\[\[(.*?)\]\]/g,'<span class="gap">______</span>');
+  let F,B;
+  if(cardDir==="en"){
+    F=`<div class="fc-w">${esc(w)}</div>${sayBtn}<div class="fc-h">Нажмите, чтобы перевернуть</div>`;
+    B=`<div class="fc-t">${esc(t)}</div><div class="fc-e">${gapHtml(e)}</div><div class="fc-h muted">Нажмите на пропуск, чтобы увидеть слово</div>`;
+  } else {
+    F=`<div class="fc-w" style="font-size:22px">${esc(t)}</div><div class="fc-e" style="color:rgba(255,255,255,.92);margin-top:16px">${blank.replace(/class="gap"/g,'class="gap" style="color:#fff;border-color:#fff"')}</div><div class="fc-h">Вспомните слово и вставьте его в предложение · нажмите, чтобы проверить</div>`;
+    B=`<div class="fc-t" style="font-size:24px">${esc(w)}</div><div class="fc-e">${filled}</div><button class="say" style="background:rgba(253,23,150,.12);color:var(--accent)" onclick="event.stopPropagation();say(${JSON.stringify(w).replace(/"/g,"&quot;")})">🔊 Послушать</button>`;
+  }
+  app.innerHTML = `${backBtn()}
+    <div class="muted" style="font-size:13px;font-weight:700">Осталось: ${v.q.length} · выучено за подход: ${v.done}</div>
+    <div class="progress"><i style="width:${Math.round(v.done/v.total*100)}%"></i></div>
+    <div class="fc ${v.flip?"flip":""}" onclick="flipCard()">
+      <div class="fc-in"><div class="fc-f">${F}</div><div class="fc-b">${B}</div></div>
+    </div>
+    <div class="row2"><button class="btn ghost" onclick="cardAns(false)">Ещё повторить</button><button class="btn" onclick="cardAns(true)">Знаю ✓</button></div>`;
+}
+function flipCard(){ const v=cur(); v.flip=!v.flip; haptic(); document.querySelector('.fc').classList.toggle('flip'); }
+function cardAns(ok){
+  const v=cur(), c=v.q.shift(); markActive();
+  if(ok){ const k=known(CUR.n,v.level); if(!k.includes(c[0])){k.push(c[0]); store.set(ckey(CUR.n,v.level),k);} v.done++; haptic("success"); }
+  else { v.q.splice(Math.min(3,v.q.length),0,c); haptic(); }
+  v.flip=false; render();
+}
+function renderProgress(){
+  const s=streak();
+  app.innerHTML = `${backBtn()}
+    <h2 style="margin-top:0">📈 Мой прогресс</h2>
+    <div class="stat">
+      <div class="card"><b>${s}</b><span class="muted">🔥 ${s===1?"день":s>1&&s<5?"дня":"дней"} подряд</span></div>
+      <div class="card"><b>${totalKnown()}</b><span class="muted">слов выучено</span></div>
+      <div class="card"><b>${weeksDone()}</b><span class="muted">недель пройдено</span></div>
+    </div>
+    <h2>Неделя ${CUR.n}</h2>
+    ${LEVELS.map(l=>{const x=CUR.levels[l.id]; if(!x) return ""; const k=known(CUR.n,l.id).length;
+      return `<div class="card"><span class="tag" style="background:${l.color};color:${l.fg}">${esc(l.name)}</span><b>${esc(x.title)}</b>
+        <div class="progress" style="margin:10px 0 4px"><i style="width:${Math.round(k/x.words.length*100)}%"></i></div>
+        <span class="muted" style="font-size:13px">Выучено ${k} из ${x.words.length} слов</span></div>`;}).join("")}
+    <p class="muted" style="font-size:13px;text-align:center">Серия растёт, когда вы тренируете карточки каждый день 💪</p>
+    <button class="btn" onclick="go({name:'cardsLv'})">Учить слова</button>`;
+}
+
+/* ---------- Тест ---------- */
+function startTest(){
+  // перемешиваем варианты ответов в каждом вопросе и добавляем «Не знаю»
+  const items = LEVEL_TEST.map(it=>{
+    const idx = it.o.map((_,k)=>k).sort(()=>Math.random()-.5);
+    return {lv:it.lv, q:it.q, o:[...idx.map(k=>it.o[k]), DONT_KNOW], a:idx.indexOf(it.a)};
+  });
+  go({name:"quiz", i:0, score:0, items});
+}
+function renderQuiz(v){
+  if(v.i >= v.items.length) return renderResult(v);
+  const item = v.items[v.i];
+  app.innerHTML = `${backBtn()}
+    <div class="muted" style="font-size:13px;font-weight:700">Вопрос ${v.i+1} из ${v.items.length}</div>
+    <div class="progress"><i style="width:${Math.round(v.i/v.items.length*100)}%"></i></div>
+    <div class="q">${esc(item.q)}</div>
+    ${item.o.map((o,k)=>`<button class="opt" ${o===DONT_KNOW?'style="color:var(--muted);border-style:dashed"':""} onclick="answer(${k})">${esc(o)}</button>`).join("")}
+    <button class="back" style="display:block;margin:18px auto 0;font-size:14px" onclick="stack.pop();startTest()">🔄 Начать тест заново</button>`;
+}
+function resetTest(){ store.set("level",null); store.set("track",null); stack.length=1; startTest(); }
+function answer(k){ const v=cur(); const it=v.items[v.i]; v.byLv=v.byLv||{}; const b=v.byLv[it.lv]=v.byLv[it.lv]||[0,0]; b[1]++; if(k===it.a){ v.score++; b[0]++; } haptic(); v.i++; render(); window.scrollTo(0,0); }
+function renderResult(v){
+  const ORDER=["A1","A2","B1","B2","C1","C2"], by=v.byLv||{};
+  const pct = l => { const [ok,n]=by[l]||[0,0]; return n?ok/n:0; };
+  let track;
+  if (pct("B1") < 0.7) track="1";          // B1 не пройден → A2+ – B1
+  else if (pct("B2") < 0.5) track="2";     // B1 пройден, B2 меньше половины → B1+ – B2
+  else track="3";                           // B2 половина и больше → B2+ – C1
+  const L = lvl(track);
+  const TXT = {
+    "1": ["Ваша группа материалов — A2+ – B1", pct("A2")<0.5 ? "Начнём с основ: материалы A2+ – B1 помогут уверенно заговорить. Пересматривайте видео и учите карточки каждый день — прогресс придёт быстро." : "Хорошая база! Материалы A2+ – B1 помогут закрепить грамматику и заговорить увереннее."],
+    "2": ["Ваша группа материалов — B1+ – B2", "Вы уже общаетесь на бытовые темы. Материалы B1+ – B2 помогут говорить свободно, без пауз и ошибок."],
+    "3": ["Ваша группа материалов — B2+ – C1", pct("C1")>=0.7 ? "Впечатляет! Материалы B2+ – C1 и разговорный клуб отшлифуют ваш английский до уровня носителя." : "Отличный уровень! Материалы B2+ – C1 добавят продвинутую лексику, идиомы и естественность речи."]
+  }[track];
+  store.set("level", L.name); store.set("track", track);
+  haptic("success");
+  const bars = ORDER.map(l=>{ const [ok,n]=by[l]||[0,0]; const p=n?Math.round(ok/n*100):0;
+    return `<div style="display:flex;align-items:center;gap:8px;margin:5px 0;font-size:13px"><b style="width:26px">${l}</b><div class="progress" style="flex:1;margin:0"><i style="width:${p}%"></i></div><span class="muted" style="width:44px;text-align:right">${ok}/${n}</span></div>`;}).join("");
+  app.innerHTML = `<div class="card result">
+      <div class="muted" style="font-weight:700">Ваш уровень</div>
+      <div class="level" style="font-size:52px">${esc(L.name)}</div>
+      <p class="muted" style="margin-top:8px">${v.score} из ${v.items.length} правильных</p>
+      <p>${esc(TXT[1])}</p>
+      <div style="text-align:left;margin-top:12px">${bars}</div>
+    </div>
+    <button class="btn" onclick="stack.length=1;go({name:'levels'});go({name:'topics',level:'${track}'})">Мои материалы: ${esc(L.name)} →</button>
+    <button class="btn dark" onclick="stack.length=1;go({name:'club'})">Разговорный клуб ${esc(CLUB.name)}</button>
+    <button class="btn ghost" onclick="shareResult('${L.name}')">Поделиться результатом</button>
+    <button class="btn ghost" onclick="resetTest()">🔄 Сбросить результат и пройти заново</button>
+    <button class="back" style="display:block;margin:16px auto 0" onclick="home()">В главное меню</button>`;
+}
+function shareResult(level){
+  const text = `Мой уровень английского — ${level}! Проверь свой 🎯`;
+  const url = "https://t.me/share/url?url="+encodeURIComponent(CONFIG.shareLink)+"&text="+encodeURIComponent(text);
+  try{ if(inTelegram){ tg.openTelegramLink(url); return; } }catch(e){}
+  window.open(url,"_blank");
+}
+
+/* ---------- Загрузка материалов из Google-таблицы (если указана) ---------- */
+function parseCSV(t){
+  const rows=[]; let row=[], f="", q=false;
+  for(let i=0;i<t.length;i++){ const c=t[i];
+    if(q){ if(c==='"'&&t[i+1]==='"'){f+='"';i++;} else if(c==='"') q=false; else f+=c; }
+    else if(c==='"') q=true; else if(c===','){row.push(f);f="";}
+    else if(c==='\n'||c==='\r'){ if(c==='\r'&&t[i+1]==='\n') i++; row.push(f); rows.push(row); row=[]; f=""; }
+    else f+=c; }
+  if(f||row.length){row.push(f);rows.push(row);}
+  return rows;
+}
+function normLevel(s){ s=String(s).trim(); if(/^[123]$/.test(s)) return s;
+  const u=s.toUpperCase().replace(/\s/g,""); if(u.startsWith("A2")) return "1"; if(u.startsWith("B1")) return "2"; if(u.startsWith("B2")) return "3"; return ""; }
+async function loadSheet(){
+  if(!CONFIG.sheetCsvUrl) return;
+  try{
+    const r = await fetch(CONFIG.sheetCsvUrl, {cache:"no-store"}); if(!r.ok) return;
+    const rows = parseCSV(await r.text()); const h = rows.shift().map(x=>x.trim().toLowerCase());
+    const col = n => h.indexOf(n);
+    const data = rows.map(r=>({level:normLevel(r[col("level")]), topic:(r[col("topic")]||"").trim(),
+      title:(r[col("title")]||"").trim(), link:(r[col("link")]||"").trim(), date:(r[col("date")]||"").trim()}))
+      .filter(m=>m.level && m.topic && m.title);
+    if(data.length){ MATERIALS = data; render(); }
+  }catch(e){}
+}
+
+
+async function loadCards(){
+  if(!CONFIG.cardsCsvUrl) return;
+  try{
+    const r = await fetch(CONFIG.cardsCsvUrl, {cache:"no-store"}); if(!r.ok) return;
+    const rows = parseCSV(await r.text()); const h = rows.shift().map(x=>x.trim().toLowerCase()); const c=n=>h.indexOf(n);
+    const W={};
+    rows.forEach(r=>{ const wk=parseInt(r[c("week")]); const lv=normLevel(r[c("level")]); const word=(r[c("word")]||"").trim();
+      if(!wk||!lv||!word) return;
+      W[wk]=W[wk]||{n:wk,levels:{}}; const L=W[wk].levels[lv]=W[wk].levels[lv]||{title:(r[c("video")]||"").trim(),p1:0,words:[]};
+      if(String(r[c("part")]).trim()==="1") L.p1++;
+      L.words.push([word,(r[c("translation")]||"").trim(),(r[c("example")]||"").trim()]); });
+    const list=Object.values(W).sort((a,b)=>a.n-b.n);
+    if(list.length){ WEEKS=list; CUR=WEEKS[WEEKS.length-1]; render(); }
+  }catch(e){}
+}
+
+function normDate(v){ v=String(v||"").trim(); let m;
+  if(/^\d{4}-\d{2}-\d{2}/.test(v)) return v.slice(0,10);
+  if(/^\d{5}$/.test(v)){ const t=new Date(Date.UTC(1899,11,30)+(+v)*864e5); return t.toISOString().slice(0,10); }
+  if((m=v.match(/^(\d{1,2})[.\/](\d{1,2})[.\/](\d{4})/))) return m[3]+"-"+m[2].padStart(2,"0")+"-"+m[1].padStart(2,"0");
+  return ""; }
+async function loadParts(){
+  if(!CONFIG.partsCsvUrl) return;
+  try{
+    const r = await fetch(CONFIG.partsCsvUrl, {cache:"no-store"}); if(!r.ok) return;
+    const rows = parseCSV(await r.text()); const h = rows.shift().map(x=>x.trim().toLowerCase()); const c=n=>h.indexOf(n);
+    const data = rows.map(r=>({level:normLevel(r[c("level")]), title:(r[c("title")]||"").trim(), part:parseInt(r[c("part")]),
+      date:normDate(r[c("date")]), link:(r[c("link")]||"").trim()})).filter(x=>x.level && x.title && x.part);
+    if(data.length){ PARTS = data; render(); }
+  }catch(e){}
+}
+stack.push({name:"home"}); render(); loadSheet(); loadCards(); loadParts();
+</script>
+</body>
+</html>
