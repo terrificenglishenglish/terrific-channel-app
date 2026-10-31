@@ -408,7 +408,7 @@ function renderHome(){
         <div><h3>Задать вопрос</h3><p>Напишите нам: @terrificenglish</p></div><span class="arrow">›</span>
       </div>
     </div>
-    <footer>Made with ❤️ by ${esc(CONFIG.author)} · версия 31.10.2</footer>`;
+    <footer>Made with ❤️ by ${esc(CONFIG.author)} · версия 31.10.3</footer>`;
 }
 
 function renderLevels(){
@@ -448,18 +448,30 @@ function renderHub(v){
         <div><h3>Грамматика</h3><p>Программа на ${ng} недель</p></div><span class="arrow">›</span></div>
     </div>`;
 }
+/* ссылка на урок грамматики: Part 3 (Grammar Focus) той недели уровня, которой соответствует тема */
+function grammarLink(g){
+  if(g.link) return g.link;
+  const mats = MATERIALS.filter(m=>m.level===g.level).sort((x,y)=>String(x.date).localeCompare(String(y.date)));
+  const m = mats[g.week-1]; if(!m) return "";
+  const key=s=>String(s).trim().toLowerCase();
+  const r = PARTS.find(x=>x.level===g.level && key(x.title)===key(m.title) && x.part===3);
+  return r && r.link ? r.link : "";
+}
 function renderGrammar(){
   const groups = [["A1–A2",c=>c.startsWith("A")],["B1",c=>c.startsWith("B1")],["B2",c=>c.startsWith("B2")],["C1",c=>c.startsWith("C1")]];
+  const ready = GRAMMAR.filter(g=>grammarLink(g));
+  const row = g => { const L=grammarLink(g); return `
+        <div class="item ${L?"":"soon"}" onclick="${L?`openLink(grammarLink(GRAMMAR[${GRAMMAR.indexOf(g)}]))`:""}">
+          <div class="play" style="font-weight:800;font-size:11px;width:44px;border-radius:12px">${esc(g.cefr)}</div>
+          <div><b>${esc(g.title)}</b><small style="font-style:italic">${esc(g.example)}</small><br><small>Для: ${esc(g.cefr)} · ${L?"✅ открыть урок":"скоро"}</small></div></div>`; };
   app.innerHTML = `${backBtn()}
     <h2 style="margin-top:0">🧩 Грамматика</h2>
     <p class="muted" style="margin-top:-4px">Выбирайте любые темы — у каждой указано, для какого уровня она</p>
+    ${ready.length?`<h2>✨ Уже вышли</h2><div class="card" style="padding:4px 16px">${ready.map(row).join("")}</div>`:""}
     ${groups.map(([name,test])=>{
-      const list = GRAMMAR.filter(g=>test(g.cefr));
+      const list = GRAMMAR.filter(g=>test(g.cefr) && !grammarLink(g));
       if(!list.length) return "";
-      return `<h2>${name}</h2><div class="card" style="padding:4px 16px">${list.map(g=>`
-        <div class="item ${g.link?"":"soon"}" onclick="${g.link?`openLink(GRAMMAR[${GRAMMAR.indexOf(g)}].link)`:""}">
-          <div class="play" style="font-weight:800;font-size:11px;width:44px;border-radius:12px">${esc(g.cefr)}</div>
-          <div><b>${esc(g.title)}</b><small style="font-style:italic">${esc(g.example)}</small><br><small>Для: ${esc(g.cefr)} · ${g.link?"открыть урок":"скоро"}</small></div></div>`).join("")}</div>`;
+      return `<h2>${name}</h2><div class="card" style="padding:4px 16px">${list.map(row).join("")}</div>`;
     }).join("")}`;
 }
 
