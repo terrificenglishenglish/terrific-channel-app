@@ -408,7 +408,7 @@ function renderHome(){
         <div><h3>Задать вопрос</h3><p>Напишите нам: @terrificenglish</p></div><span class="arrow">›</span>
       </div>
     </div>
-    <footer>Made with ❤️ by ${esc(CONFIG.author)} · версия 31.10.3</footer>`;
+    <footer>Made with ❤️ by ${esc(CONFIG.author)} · версия 01.11</footer>`;
 }
 
 function renderLevels(){
@@ -796,7 +796,15 @@ async function loadParts(){
     if(data.length){ PARTS = data; render(); }
   }catch(e){}
 }
-stack.push({name:"home"}); render(); loadSheet(); loadCards(); loadParts();
+stack.push({name:"home"});
+/* deep link: t.me/TerrificCommunityBot/app?startapp=cards_2 → сразу карточки уровня; fresh_2 → «Новое за неделю» уровня */
+(function(){
+  let sp=""; try{ sp=(tg&&tg.initDataUnsafe&&tg.initDataUnsafe.start_param)||new URLSearchParams(location.search).get("startapp")||""; }catch(e){}
+  let m;
+  if((m=sp.match(/^cards_([123])$/))){ stack.push({name:"cardsLv"}); stack.push({name:"cardsMode",level:m[1]}); }
+  else if((m=sp.match(/^fresh_([123])$/))){ stack.push({name:"fresh",lv:m[1]}); }
+})();
+render(); loadSheet(); loadCards(); loadParts();
 </script>
 </body>
 </html>
